@@ -316,14 +316,81 @@ done
 
 
 
-# Part 3: PLINK2 QC #
+# Part 3: PLINK2 Analysis #
+
+
+
+
+## Step 3.1: Import dosage files into PLINK2 format
 
 ## Define combined consent group directories:
 WHI_SHARE_aa_cb_p2o=${WHI_SHARE}/combined_consentgroups/geno/WHI_SHARE_aa.genotype/plink2out
 WHI_SHARE_ha_cb_p2o=${WHI_SHARE}/combined_consentgroups/geno/WHI_SHARE_ha.genotype/plink2out
-rscripts=$HOME/gwas_pancan/scripts/WHI/plink
+rscripts=$HOME/SAP2-GWAS/gwas_pancan_scripts
+
+# Import dosage files for SHARE_aa excluding the low quality snps identified earlier
+plink2 --import-dosage "${WHI_SHARE_aa_cb_d2po}"/SHARE_aa.pdat \
+	--psam "${WHI_SHARE_aa_cb_d2po}"/SHARE_aa.pfam \
+	--exclude "${WHI_SHARE_aa_cb_lq}"/SHARE_aa_lq_all_snps.txt \
+	--make-pgen \
+	--out "${WHI_SHARE_aa_cb_p2o}"/WHI_SHARE_aa_temp
+
+# Import dosage files for SHARE_ha excluding the low quality snps identified earlier
+plink2 --import-dosage "${WHI_SHARE_ha_cb_d2po}"/SHARE_ha.pdat \
+	--psam "${WHI_SHARE_ha_cb_d2po}"/SHARE_ha.pfam \
+	--exclude "${WHI_SHARE_ha_cb_lq}"/SHARE_ha_lq_all_snps.txt \
+	--make-pgen \
+	--out "${WHI_SHARE_ha_cb_p2o}"/WHI_SHARE_ha_temp
+
+
+
+
+## Step 3.2: Correct pfiles ##
+
+# Once the files have been imported into plink format the chromosome and position information must be updated as they are currently null. 
+# To do this we will use information that is present within the pvar file.
+
+echo "Generating files for african americans"
+# Print the 3rd column called ID from the pvar file and split it based on ':' then take the first and second element. Take off the header and add a new header and add to new file
+echo "Taking ID and splitting into chromosome and position for later use..."
+awk 'BEGIN{FS="\t"; OFS="\t"}{print $3}' "${WHI_SHARE_aa_cb_d2po}"/WHI_SHARE_aa_temp.pvar | awk 'BEGIN{FS=":";OFS="\t"}{print $1,$2}' | tail -n+2 | sed '1i #CHROM POS' > "${WHI_SHARE_aa_cb_d2po}"/WHI_SHARE_aa_temp_chrpos.pvar
+# Paste the original pvar and the new intermediate file into another intermediate file
+echo "Making temporary file..."
+paste "${WHI_SHARE_aa_cb_d2po}"/WHI_SHARE_aa_temp.pvar "${WHI_SHARE_aa_cb_d2po}"/WHI_SHARE_aa_temp_chrpos.pvar > "${WHI_SHARE_aa_cb_d2po}"/WHI_SHARE_aa_temp_w_chrpos.pvar
+# Make a new pvar file with the corrected columns
+echo "Make new pvar file with correct chromosome and position information..."
+awk 'BEGIN{FS="\t";OFS="\t"}{print $6,$7,$3,$4,$5}' "${WHI_SHARE_aa_cb_d2po}"/WHI_SHARE_aa_temp_w_chrpos.pvar > "${WHI_SHARE_aa_cb_d2po}"/WHI_SHARE_aa_temp_updated.pvar
+# Copy the other pfiles with a matching name so that plink2 knows they are together.
+echo "Copying other files in the set for plink compatibility..."
+cp "${WHI_SHARE_aa_cb_d2po}"/WHI_SHARE_aa_temp.psam "${WHI_SHARE_aa_cb_d2po}"/WHI_SHARE_aa_temp_updated.psam
+cp  "${WHI_SHARE_aa_cb_d2po}"/WHI_SHARE_aa_temp.pgen "${WHI_SHARE_aa_cb_d2po}"/WHI_SHARE_aa_temp_updated.pgen
+echo "Done"
+
+echo "Generating files for african americans"
+# Print the 3rd column called ID from the pvar file and split it based on ':' then take the first and second element. Take off the header and add a new header and add to new file
+echo "Taking ID and splitting into chromosome and position for later use..."
+awk 'BEGIN{FS="\t"; OFS="\t"}{print $3}' "${WHI_SHARE_ha_cb_d2po}"/WHI_SHARE_ha_temp.pvar | awk 'BEGIN{FS=":";OFS="\t"}{print $1,$2}' | tail -n+2 | sed '1i #CHROM POS' > "${WHI_SHARE_ha_cb_d2po}"/WHI_SHARE_ha_temp_chrpos.pvar
+# Paste the original pvar and the new intermediate file into another intermediate file
+echo "Making temporary file..."
+paste "${WHI_SHARE_ha_cb_d2po}"/WHI_SHARE_ha_temp.pvar "${WHI_SHARE_ha_cb_d2po}"/WHI_SHARE_ha_temp_chrpos.pvar > "${WHI_SHARE_ha_cb_d2po}"/WHI_SHARE_ha_temp_w_chrpos.pvar
+# Make a new pvar file with the corrected columns
+echo "Make new pvar file with correct chromosome and position information..."
+awk 'BEGIN{FS="\t";OFS="\t"}{print $6,$7,$3,$4,$5}' "${WHI_SHARE_ha_cb_d2po}"/WHI_SHARE_ha_temp_w_chrpos.pvar > "${WHI_SHARE_ha_cb_d2po}"/WHI_SHARE_ha_temp_updated.pvar
+# Copy the other pfiles with a matching name so that plink2 knows they are together.
+cp "${WHI_SHARE_ha_cb_d2po}"/WHI_SHARE_ha_temp.psam "${WHI_SHARE_ha_cb_d2po}"/WHI_SHARE_ha_temp_updated.psam
+cp  "${WHI_SHARE_ha_cb_d2po}"/WHI_SHARE_ha_temp.pgen "${WHI_SHARE_ha_cb_d2po}"/WHI_SHARE_ha_temp_updated.pgen
+echo "Done"
+
+echo "Process Complete"
+
+
+
+
+## Step 3.3: PLINK2 QC ##
+# The first steps of the quality control must be performed to remove missing and poor quality data.
 
 ### Step 1 ### 
+
 
 # Investigate missingness per individual and per SNP and make histograms.
 echo "Investigating missingness per individuals for african american"
