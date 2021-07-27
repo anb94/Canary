@@ -14,7 +14,7 @@
 ## Additionally, we will isolate covariates used in the analysis during this process.
 
 ## Define location of python script
-${pathtoscript}=$HOME/SAP2-GWAS/gwas_pancan_scripts
+pathtoscript=$HOME/SAP2-GWAS/gwas_pancan_scripts
 
 ./"${pathtoscript}"/generatephenodata.py
 
