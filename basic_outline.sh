@@ -69,10 +69,10 @@ for ((i=1; i<=22; i++)); do
     echo "Copying Files and Generating low quality SNPs for African Americans"
     echo "Doing Chromosome number ${i}"
 
-    cp ${WHI_SHARE_aa_c1}/SHAREchr${i}aa.info ${WHI_SHARE_aa_cb}/SHAREchr${i}aa.info
+    cp "${WHI_SHARE_aa_c1}"/SHAREchr${i}aa.info "${WHI_SHARE_aa_cb}"/SHAREchr${i}aa.info
 
-    awk '{if ($7 < 0.3) print $1}' ${WHI_SHARE_aa_cb}/SHAREchr${i}aa.info > ${WHI_SHARE_aa_cb_lq}/SHAREchr${i}aa_lq03_snps.txt
-    awk '{if ($7 < 0.8) print $1}' ${WHI_SHARE_aa_cb}/SHAREchr${i}aa.info > ${WHI_SHARE_aa_cb_lq}/SHAREchr${i}aa_lq08_snps.txt
+    awk '{if ($7 < 0.3) print $1}' "${WHI_SHARE_aa_cb}"/SHAREchr"${i}"aa.info > "${WHI_SHARE_aa_cb_lq}"/SHAREchr"${i}"aa_lq03_snps.txt
+    awk '{if ($7 < 0.8) print $1}' "${WHI_SHARE_aa_cb}"/SHAREchr"${i}"aa.info > "${WHI_SHARE_aa_cb_lq}"/SHAREchr"${i}"aa_lq08_snps.txt
 done
 
 echo "Completed Generating low quality SNPs for African Americans"
@@ -81,10 +81,10 @@ for ((i=1; i<=22; i++)); do
     echo "Copying Files and Generating low quality SNPs for Hispanic Americans"
     echo "Doing Chromosome number ${i}"
 
-    cp ${WHI_SHARE_ha_c1}/SHAREchr${i}ha.info ${WHI_SHARE_ha_cb}/SHAREchr${i}ha.info
+    cp "${WHI_SHARE_ha_c1}"/SHAREchr"${i}"ha.info "${WHI_SHARE_ha_cb}"/SHAREchr"${i}"ha.info
 
-    awk '{if ($7 < 0.3) print $1}' ${WHI_SHARE_ha_cb}/SHAREchr${i}ha.info > ${WHI_SHARE_ha_cb_lq}/SHAREchr${i}ha_lq03_snps.txt
-    awk '{if ($7 < 0.8) print $1}' ${WHI_SHARE_ha_cb}/SHAREchr${i}ha.info > ${WHI_SHARE_ha_cb_lq}/SHAREchr${i}ha_lq08_snps.txt
+    awk '{if ($7 < 0.3) print $1}' "${WHI_SHARE_ha_cb}"/SHAREchr"${i}"ha.info > "${WHI_SHARE_ha_cb_lq}"/SHAREchr"${i}"ha_lq03_snps.txt
+    awk '{if ($7 < 0.8) print $1}' "${WHI_SHARE_ha_cb}"/SHAREchr"${i}"ha.info > "${WHI_SHARE_ha_cb_lq}"/SHAREchr"${i}"ha_lq08_snps.txt
 done
 
 echo "Completed Generating low quality SNPs for Hispanic Americans"
@@ -259,7 +259,7 @@ awk '{print 0,$1,0,0}' ${WHI_SHARE_ha_cb_d2po}/SHARE_ha.pdat > ${WHI_SHARE_ha_cb
 ## Step A.1: Download Rereference Genome ##
 
 # Create/define environment variables
-mkdir $HOME/SAP2-GWAS_ref_genome
+mkdir "$HOME"/SAP2-GWAS_ref_genome
 genome_dir=$HOME/SAP2-GWAS_ref_genome
 
 # Download the file to the scratch directory
@@ -280,9 +280,9 @@ rm "${genome_dir}"/snp_annot_grch37.txt "${genome_dir}"/snp_annot_grch37_withLoc
 # Generating position files (posfiles)
 for ((i=1; i<=22; i++)); do
 echo "Doing SHAREchr${i}aa.info"
-paste ${WHI_SHARE_aa_cb}/SHAREchr"${i}"aa.info <(cut -f 1 ${WHI_SHARE_aa_cb}/SHAREchr${i}aa.info | cut -d ":" -f 1,2 | sed 's/SNP/CHR_POS/') > ${WHI_SHARE_aa_cb}/SHAREchr"${i}"aa.pos
+paste "${WHI_SHARE_aa_cb}"/SHAREchr"${i}"aa.info <(cut -f 1 "${WHI_SHARE_aa_cb}"/SHAREchr"${i}"aa.info | cut -d ":" -f 1,2 | sed 's/SNP/CHR_POS/') > "${WHI_SHARE_aa_cb}"/SHAREchr"${i}"aa.pos
 echo "Doing SHAREchr${i}ha.info"
-paste ${WHI_SHARE_ha_cb}/SHAREchr"${i}"ha.info <(cut -f 1 ${WHI_SHARE_ha_cb}/SHAREchr${i}ha.info | cut -d ":" -f 1,2 | sed 's/SNP/CHR_POS/') > ${WHI_SHARE_ha_cb}/SHAREchr"${i}"ha.pos
+paste "${WHI_SHARE_ha_cb}"/SHAREchr"${i}"ha.info <(cut -f 1 "${WHI_SHARE_ha_cb}"/SHAREchr"${i}"ha.info | cut -d ":" -f 1,2 | sed 's/SNP/CHR_POS/') > "${WHI_SHARE_ha_cb}"/SHAREchr"${i}"ha.pos
 done
 
 # Comebine the posfiles
@@ -320,7 +320,7 @@ done
 
 ## Define combined consent group directories:
 WHI_SHARE_aa_cb_p2o=${WHI_SHARE}/combined_consentgroups/geno/WHI_SHARE_aa.genotype/plink2out
-WHI_SHARE_ha_cb_p20=${WHI_SHARE}/combined_consentgroups/geno/WHI_SHARE_ha.genotype/plink2out
+WHI_SHARE_ha_cb_p2o=${WHI_SHARE}/combined_consentgroups/geno/WHI_SHARE_ha.genotype/plink2out
 rscripts=$HOME/gwas_pancan/scripts/WHI/plink
 
 ### Step 1 ### 
