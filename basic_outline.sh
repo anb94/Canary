@@ -131,6 +131,8 @@ cat "${WHI_SHARE_ha_cb_lq}"/SHARE_ha_lq03_snps.txt >> "${WHI_SHARE_ha_cb_lq}"/SH
 # For each chromosome, the number of rows in .info should equal n-1 of number of columns in .dose
 # This information will be retreived using awk and stored in a log file within the ethnicities directory.
 
+#### NOTE ---- CHANGE THIS TO ASK DO THEY EQUAL eachother with n-1 since one has header as a QC
+
 # African American
 for ((i=1; i<=22; i++)); do
     echo "Doing AA Chromosome ${i}"
@@ -388,7 +390,8 @@ echo "Process Complete"
 ## Step 3.3: PLINK2 QC ##
 # The first steps of the quality control must be performed to remove missing and poor quality data.
 
-## QC Step 1: Investigate missingness ##
+
+### QC Step 1: Investigate missingness ###
 
 
 # Investigate missingness per individual and per SNP and make histograms.
@@ -426,12 +429,14 @@ plink2 --pfile "${WHI_SHARE_aa_cb_p2o}"/WHI_SHARE_aa_temp_4 --mind 0.02 --make-p
 plink2 --pfile "${WHI_SHARE_ha_cb_p2o}"/WHI_SHARE_ha_temp_4 --mind 0.02 --make-pgen --out "${WHI_SHARE_ha_cb_p2o}"/WHI_SHARE_ha_temp_5
 
 
-### Step2 #### - Check for sex discrepancy.
+### QC Step 2: Check for sex discrepancy ###
 
 ##  All individuals in this dataset are definitely female therefore no need to complete this step.
 
+#### IMPORTANT NOTE!!! - THIS WILL NEED TO BE INCLUDED FOR THE TOOL ####
 
-### Step 3 ### - Minor Allele Frequency
+
+## QC Step 3: Minor Allele Frequency ###
 
 # Generate a plot of the MAF distribution.
 plink2 --pfile "${WHI_SHARE_aa_cb_p2o}"/WHI_SHARE_aa_temp_5 --freq --out "${WHI_SHARE_aa_cb_p2o}"/MAF_check
@@ -445,6 +450,8 @@ echo "Delete variants with a minor allele frequency of more than 0.05"
 plink2 --pfile "${WHI_SHARE_aa_cb_p2o}"/WHI_SHARE_aa_temp_5 --maf 0.05 --make-pgen --out "${WHI_SHARE_aa_cb_p2o}"/WHI_SHARE_aa_temp_6
 plink2 --pfile "${WHI_SHARE_ha_cb_p2o}"/WHI_SHARE_ha_temp_5 --maf 0.05 --make-pgen --out "${WHI_SHARE_ha_cb_p2o}"/WHI_SHARE_ha_temp_6
 
+
+### QC Step 4: Hardy-Weinberg equilibrium ###
 
 # Delete SNPs which are not in Hardy-Weinberg equilibrium (HWE).
 # Check the distribution of HWE p-values of all SNPs.
@@ -467,6 +474,8 @@ plink2 --pfile "${WHI_SHARE_ha_cb_p2o}"/WHI_SHARE_ha_temp_6 --hwe 1e-6 --make-pg
 plink2 --pfile "${WHI_SHARE_aa_cb_p2o}"/WHI_SHARE_aa_temp_filter_step1 --hwe 1e-10 --make-pgen --out "${WHI_SHARE_aa_cb_p2o}"/WHI_SHARE_aa_temp_7
 plink2 --pfile "${WHI_SHARE_ha_cb_p2o}"/WHI_SHARE_ha_temp_filter_step1 --hwe 1e-10 --make-pgen --out "${WHI_SHARE_ha_cb_p2o}"/WHI_SHARE_ha_temp_7
 
+
+### QC Step 5: Check heterozygosity ###
 
 # Checks for heterozygosity are performed on a set of SNPs which are not highly correlated.
 # Therefore, to generate a list of non-(highly)correlated SNPs, we exclude high inversion regions (inversion.txt [High LD regions]) and prune the SNPs using the command --indep-pairwise�.
