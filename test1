@@ -1,0 +1,66 @@
+#!/bin/bash
+
+########################################################################
+
+while getopts "m:" opt; do
+    case $opt in
+        m) multi+=("$OPTARG");;
+        #...
+    esac
+done
+shift $((OPTIND -1))
+
+
+
+
+
+
+########################################################################
+
+
+
+# PART 1: Prepare phenotype data #
+
+## Additionally, we will isolate covariates used in the analysis during this process.
+
+## Define location of python script
+pathtoscript=$HOME/SAP2-GWAS/gwas_pancan_scripts
+
+./"${pathtoscript}"/generatephenodata.py
+
+
+# PART 2: Prepare genotype data #
+
+## Step 2.1: Combine datasets ##
+
+## Define environment variables
+### Define SHARE Root directory:
+dataset_base_dir=$HOME/SAP2-GWAS/datasets/
+dataset1=${dataset_base_dir}/dataset
+### Define African American consent group 1 and 2 variables:
+
+project=TEST
+c1_dataset_dir=$HOME/indir_1
+c2_dataset_dir=$HOME/indir_2
+consent_groups=$HOME/consentgroups
+cb_dataset_dir=$HOME/outdir_cb
+
+IFS=$'\n' read -d '' -r -a lines < /etc/passwd
+
+for i in "${consent_groups[@]}"; do
+## Concatenate consent groups 1 and 2 for African American
+    for ((j=1; j<=22; j++)); do
+        echo "Concatenating ${project} consent group ${i} for chromosome ${j}"
+        cat "${i}"/*chr"${j}"*.dose* >> "${cb_dataset_dir}"/"${project}"_chr"${j}"*.dose
+    done
+done
+echo "Completed Concatenating ${project} Consent Groups" 
+
+
+
+
+
+head "${lines}" > lines.txt
+head "${c1_dataset_dir}" > c1.txt
+head "${c2_dataset_dir}" > c1.txt
+head "${dataset1}" > c1.txt
