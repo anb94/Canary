@@ -21,9 +21,9 @@ shift $((OPTIND -1))
 
 # PART 1: Prepare phenotype data #
 
-## Additionally, we will isolate covariates used in the analysis during this process.
+  ## Additionally, we will isolate covariates used in the analysis during this process.
 
-## Define location of python script
+  ## Define location of python script
 pathtoscript=$HOME/SAP2-GWAS/gwas_pancan_scripts
 
 ./"${pathtoscript}"/generatephenodata.py
@@ -33,11 +33,11 @@ pathtoscript=$HOME/SAP2-GWAS/gwas_pancan_scripts
 
 ## Step 2.1: Combine datasets ##
 
-## Define environment variables
-### Define SHARE Root directory:
+  ## Define environment variables
+  ### Define SHARE Root directory:
 dataset_base_dir=$HOME/SAP2-GWAS/datasets/
 dataset1=${dataset_base_dir}/dataset
-### Define African American consent group 1 and 2 variables:
+  ### Define African American consent group 1 and 2 variables:
 
 project=TEST
 c1_dataset_dir=$HOME/indir_1
@@ -47,20 +47,299 @@ cb_dataset_dir=$HOME/outdir_cb
 
 IFS=$'\n' read -d '' -r -a lines < /etc/passwd
 
+  ## Concatenate consent groups
 for i in "${consent_groups[@]}"; do
-## Concatenate consent groups 1 and 2 for African American
-    for ((j=1; j<=22; j++)); do
-        echo "Concatenating ${project} consent group ${i} for chromosome ${j}"
-        cat "${i}"/*chr"${j}"*.dose* >> "${cb_dataset_dir}"/"${project}"_chr"${j}"*.dose
-    done
+  for ((j=1; j<=22; j++)); do
+    echo "Concatenating ${project} consent group ${i} for chromosome ${j}"
+    cat "${i}"/*chr"${j}"*.dose* >> "${cb_dataset_dir}"/"${project}"_chr"${j}".dose
+  done
 done
-echo "Completed Concatenating ${project} Consent Groups" 
+echo "Completed Concatenating ${project} Consent Groups"
+
+  ## As all info files in the study should be identical, copy info files from only one consent group
+
+for ((i=1; i<=22; j++)); do
+  echo "Copying ${project} info file for for chromosome ${i}"
+  cp "${consent_groups[0]}"/*chr"${i}"*.info* "${cb_dataset_dir}"/"${project}"_chr"${i}".info
+done
 
 
-
-
+####################################
 
 head "${lines}" > lines.txt
 head "${c1_dataset_dir}" > c1.txt
 head "${c2_dataset_dir}" > c1.txt
 head "${dataset1}" > c1.txt
+
+####################################
+
+
+
+
+## Step 2.2: Identify low quality Quality SNPs ##
+
+for ((i=1; i<=22; i++)); do
+  echo "Generating low quality SNPs"
+  echo "Doing Chromosome number ${i}"
+
+  awk '{if ($7 < 0.3) print $1}' "${cb_dataset_dir}"/"${project}"_chr"${i}".dose > "${cb_dataset_dir}"/"${project}"_chr"${i}"_lq03_snps.txt
+  awk '{if ($7 < 0.8) print $1}' "${cb_dataset_dir}"/"${project}"_chr"${i}".dose > "${cb_dataset_dir}"/"${project}"_chr"${i}"_lq08_snps.txt
+done
+
+echo "Completed Generating low quality SNPs"
+
+
+# The low quality SNPs files for each chromosome need to be combined into a single file.
+
+  ## Append the low qual 0.3 snp files to a combined file
+for ((i=1; i<=22; i++)); do
+  echo "Doing lq03 ${i}"
+  cat "${cb_dataset_dir}"/"${project}"_chr"${i}"_lq03_snps.txt >> "${cb_dataset_dir}"/"${project}"_all_chr_lq03_snps.txt
+done
+
+  ## Append the low qual 0.8 snp files to a combined file
+for ((i=1; i<=22; i++)); do
+  echo "Doing lq03 ${i}"
+  cat "${cb_dataset_dir}"/"${project}"_chr"${i}"_lq08_snps.txt >> "${cb_dataset_dir}"/"${project}"_all_chr_lq08_snps.txt
+done
+
+
+cat "${cb_dataset_dir}"/"${project}"_all_chr_lq03_snps.txt > "${cb_dataset_dir}"/"${project}"_all_chr_lq_all_snps.txt
+cat "${cb_dataset_dir}"/"${project}"_all_chr_lq08_snps.txt >> "${cb_dataset_dir}"/"${project}"_all_chr_lq_all_snps.txt
+
+
+
+
+## Step 2.3: Check input file dimensions Quality control ##
+
+
+  # For each chromosome, the number of rows in .info should equal n-1 of number of columns in .dose
+  # This information will be retreived using awk and stored in a log file within the ethnicities directory.
+
+  #### NOTE ---- CHANGE THIS TO ASK DO THEY EQUAL eachother with n-1 since one has header as a QC
+
+for ((i=1; i<=22; i++)); do
+  echo "Doing Chromosome ${i}"
+  info=$(awk 'END{print NR}' "${cb_dataset_dir}"/"${project}"_chr"${i}".info)
+  dose=$(awk 'END{print NF}'  "${cb_dataset_dir}"/"${project}"_chr"${i}".dose)
+  echo "Chromosome ${i} info has ${info} rows and dose has ${dose} columns"  >> "${cb_dataset_dir}"/"${project}"_qc-checklength.log
+done
+
+
+
+
+
+
+## Step 2.4: Convert MaCH or minimac input files into plink compatible dosage files ##
+
+
+  # This step needs to be performed on a machine/container which has installed dose2plink.c
+  # A singularity definition file which includes dose2plink.c can be found at https://github.com/anb94/gwas_pancan/blob/master/singularity_images/custom_singularity_images/canary_v4.def
+
+  # Use the dose2plink to convert .dose and .info to .pdat and .pfam:
+
+mkdir "${cb_dataset_dir}"/"${project}"_dose2plinkout
+dose2plinkout="${cb_dataset_dir}"/"${project}"_dose2plinkout
+
+for ((i=10; i<=22; i++)); do
+    echo "Converting .info and .dose for Chromosome ${i}"
+    dose2plink -m 7000 -dose "${cb_dataset_dir}"/"${project}"_chr"${i}".dose -info "${cb_dataset_dir}"/"${project}"_chr"${i}".info -gz 0 -out "${dose2plinkout}"/"${project}"_chr"${i}"
+done
+echo "Completed dose2plink conversion"
+
+
+
+
+
+## Step 2.5: Combine the chromosomes for each dataset into a single file ##
+
+
+  # The pdat files for each chromosome need to be combined into a single file.
+  ## Add the first file into a new pdat file and then append the rest of the fiels without the header
+cat "${dose2plinkout}"/"${project}"_chr1.pdat > "${dose2plinkout}"/"${project}"_allchr.pdat
+for ((i=2; i<=22; i++)); do
+    echo "Doing "${project}"_chr${i}"
+    cat "${dose2plinkout}"/"${project}"_chr"${i}".pdat | tail -n +2 >> "${dose2plinkout}"/"${project}"_allchr.pdat
+done
+
+
+
+
+## Step 2.6: Correct the gender for the pfam files produced ##
+
+  ### IMPORTANT NOTE ###
+  ### This step is altering the 'sex' column to '2' which is female. This is specific to the data set I used because they are all female.
+  ### For a more generic use we need to find another way to do this based on information provided elsewhere in the dataset.
+
+
+  #awk '{print $1,$2,$3,$4,2,$6}' "${WHI_SHARE_aa_cb_d2po}"/SHAREchr1aa.pfam  > "${WHI_SHARE_aa_cb_d2po}"/SHARE_aa.pfam
+
+
+  # As is, the pfam file is generic - i.e. it does not contain case vs control information or family ID.
+  # To correct this, we will use the phenotype data generated in the step above to amend the pfam file.
+
+  # ./"${pathtoscript}"/preparepfam.py
+
+cp "${dose2plinkout}"/"${project}"_chr1.pfam "${dose2plinkout}"/"${project}"_allchr.pfam
+
+
+
+
+
+## Step 2.7: Extract SNP set for later use ##
+
+
+tail -n +2 "${dose2plinkout}"/"${project}"_allchr.pdat | awk '{print $1,$2,$3}' | sort > "${dose2plinkout}"/"${project}".snpset
+
+
+  #echo "$(comm -12 "${WHI_SHARE_aa_cb_d2po}"/SHARE_aa.snpset "${WHI_SHARE_ha_cb_d2po}"/SHARE_ha.snpset)" > "${WHI_SHARE_cb}"/SHARE_sharedsnps.txt
+  #echo "$(cut -d ' ' -f 1 "${WHI_SHARE_cb}"/SHARE_sharedsnps.txt)" > "${WHI_SHARE_cb}"/SHARE_shared_alleles_snps.txt
+
+
+
+
+
+## Step 2.8: Generate map file ##
+
+  # A MAP file for our dataset (which contains a list of SNPs and their location) must be created for use with PLINK (see https://zzz.bwh.harvard.edu/plink/data.shtml#map).
+
+awk '{print 0,$1,0,0}' "${dose2plinkout}"/"${project}"_allchr.pdat > "${dose2plinkout}"/"${project}".map
+
+
+
+
+# Part 3: PLINK2 Analysis #
+mkdir "${cb_dataset_dir}"/"${project}"_plink2out
+plink2out="${cb_dataset_dir}"/"${project}"_plink2out
+
+## Step 3.1: Import dosage files into PLINK2 format
+
+  # Import dosage files for SHARE_aa excluding the low quality snps identified earlier
+echo "importing dosage files for ${project}..."
+plink2 --import-dosage "${dose2plinkout}"/"${project}"_allchr.pdat \
+	--psam "${dose2plinkout}"/"${project}"_allchr.pfam \
+	--exclude "${cb_dataset_dir}"/"${project}"_all_chr_lq_all_snps.txt \
+	--make-pgen \
+	--out "${plink2out}"/${project}_temp
+echo "Done"
+
+
+
+
+
+## Step 3.2: Correct pfiles ##
+
+# Once the files have been imported into plink format the chromosome and position information must be updated as they are currently null.
+# To do this we will use information that is present within the pvar file.
+
+echo "Generating pfiles for ${project}"
+# Print the 3rd column called ID from the pvar file and split it based on ':' then take the first and second element. Take off the header and add a new header and add to new file
+echo "Taking ID and splitting into chromosome and position for later use..."
+awk 'BEGIN{FS="\t"; OFS="\t"}{print $3}' "${plink2out}"/"${project}"_temp.pvar | awk 'BEGIN{FS=":";OFS="\t"}{print $1,$2}' | tail -n+2 | sed '1i #CHROM POS' > "${plink2out}"/"${project}"_temp_chrpos.pvar
+# Paste the original pvar and the new intermediate file into another intermediate file
+echo "Making temporary file..."
+paste "${plink2out}"/"${project}"_temp.pvar "${plink2out}"/"${project}"_temp_chrpos.pvar > "${plink2out}"/"${project}"_temp_w_chrpos.pvar
+# Make a new pvar file with the corrected columns
+echo "Make new pvar file with correct chromosome and position information..."
+awk 'BEGIN{FS="\t";OFS="\t"}{print $6,$7,$3,$4,$5}' "${plink2out}"/"${project}"_temp_w_chrpos.pvar > "${plink2out}"/"${project}"_temp_updated.pvar
+# Copy the other pfiles with a matching name so that plink2 knows they are together.
+echo "Copying other files in the set for plink compatibility..."
+cp "${plink2out}"/"${project}"_temp.psam "${plink2out}"/"${project}"_temp_updated.psam
+cp "${plink2out}"/"${project}"_temp.pgen "${plink2out}"/"${project}"_temp_updated.pgen
+echo "Done"
+
+
+
+
+
+
+
+## Step 3.3: PLINK2 QC ##
+
+  # The first steps of the quality control must be performed to remove missing and poor quality data.
+
+
+### QC Step 1: Investigate missingness ###
+
+
+  # Investigate missingness per individual and per SNP and make histograms.
+echo "Investigating missingness per individuals for ${project}"
+plink2 --pfile "${plink2out}"/"${project}"_temp_updated --missing
+
+  # output: plink.imiss and plink.lmiss, these files show respectively the proportion of missing SNPs per individual and the proportion of missing individuals per SNP.
+
+
+
+
+  # Generate plots to visualize the missingness results.
+Rscript --no-save "${pathtoscript}"/hist_miss.R
+
+  # Delete SNPs and individuals with high levels of missingness, explanation of this and all following steps can be found in box 1 and table 1 of the article mentioned in the comments of this script.
+  # The following two QC commands will not remove any SNPs or individuals. However, it is good practice to start the QC with these non-stringent thresholds.
+  # Delete SNPs with missingness >0.2.
+echo "Delete SNPs with a missingness of more than 0.2"
+plink2 --pfile "${plink2out}"/"${project}"_temp_updated --geno 0.2 --make-pgen --out "${plink2out}"/"${project}"_temp_2
+
+
+  # Delete individuals with missingness >0.2.
+echo "Delete individuals with a missingness of more than 0.2"
+plink2 --pfile "${plink2out}"/"${project}"_temp_2 --mind 0.2 --make-pgen --out "${plink2out}"/"${project}"_temp_3
+
+
+  # Delete SNPs with missingness >0.02.
+echo "Delete SNPs with a missingness of more than 0.02"
+plink2 --pfile "${plink2out}"/"${project}"_temp_3 --geno 0.02 --make-pgen --out "${plink2out}"/"${project}"_temp_4
+
+
+  # Delete individuals with missingness >0.02.
+echo "Delete individuals with a missingness of more than 0.02"
+plink2 --pfile "${plink2out}"/"${project}"_temp_4 --mind 0.02 --make-pgen --out "${plink2out}"/"${project}"_temp_5
+
+
+
+### QC Step 2: Check for sex discrepancy ###
+
+  ##  All individuals in this dataset are definitely female therefore no need to complete this step.
+
+  #### IMPORTANT NOTE!!! - THIS WILL NEED TO BE INCLUDED FOR THE TOOL ####
+
+
+## QC Step 3: Minor Allele Frequency ###
+
+  # Generate a plot of the MAF distribution.
+plink2 --pfile "${plink2out}"/"${project}"_temp_5 --freq --out "${plink2out}"/"${project}"_MAF_check
+
+
+  # Use Rscript --no-save MAF_check.R to plot this.
+Rscript --no-save "${pathtoscript}"/MAF_check.R
+
+  # Calculate MAFs. Remove all variants with MAF < 0.05 from the current analysis.
+echo "Delete variants with a minor allele frequency of more than 0.05"
+plink2 --pfile "${plink2out}"/"${project}"_temp_5 --maf 0.05 --make-pgen --out "${plink2out}"/"${project}"_temp_6
+
+
+
+
+### QC Step 4: Hardy-Weinberg equilibrium ###
+
+  # Delete SNPs which are not in Hardy-Weinberg equilibrium (HWE).
+  # Check the distribution of HWE p-values of all SNPs
+
+plink2 --pfile "${plink2out}"/"${project}"_temp_6 --hardy --out "${plink2out}"/"${project}"_hardy
+
+
+
+  # Selecting SNPs with HWE p-value below 0.00001, required for one of the two plot generated by the next Rscript, allows to zoom in on strongly deviating SNPs.
+awk '{ if ($9 <0.00001) print $0 }' "${plink2out}"/"${project}"_hardy.hardy > "${plink2out}"/"${project}"_plink2zoomhwe.hardy
+Rscript --no-save "${pathtoscript}"/hwe.R
+
+
+  # By default the --hwe option in plink only filters for controls.
+  # Therefore, we use two steps, first we use a stringent HWE threshold for controls, followed by a less stringent threshold for the case data.
+plink2 --pfile "${plink2out}"/"${project}"_temp_6 --hwe 1e-6 --make-pgen --out "${plink2out}"/"${project}"_temp_6_filter_step1
+
+
+
+    # The HWE threshold for the cases filters out only SNPs which deviate extremely from HWE.
+    # This second HWE step only focusses on cases because in the controls all SNPs with a HWE p-value < hwe 1e-6 were already removed
+plink2 --pfile "${plink2out}"/"${project}"_temp_6_filter_step1 --hwe 1e-10 --make-pgen --out "${plink2out}"/"${project}"_temp_7
