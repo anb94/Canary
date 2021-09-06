@@ -343,3 +343,11 @@ plink2 --pfile "${plink2out}"/"${project}"_temp_6 --hwe 1e-6 --make-pgen --out "
     # The HWE threshold for the cases filters out only SNPs which deviate extremely from HWE.
     # This second HWE step only focusses on cases because in the controls all SNPs with a HWE p-value < hwe 1e-6 were already removed
 plink2 --pfile "${plink2out}"/"${project}"_temp_6_filter_step1 --hwe 1e-10 --make-pgen --out "${plink2out}"/"${project}"_temp_7
+
+
+# Checks for heterozygosity are performed on a set of SNPs which are not highly correlated.
+# Therefore, to generate a list of non-(highly)correlated SNPs, we exclude high inversion regions (inversion.txt [High LD regions]) and prune the SNPs using the command --indep-pairwise�.
+# The parameters 50 5 0.20 stand respectively for: the window size, the number of SNPs to shift the window at each step, and the multiple correlation coefficient for a SNP being regressed on all other SNPs simultaneously.
+plink2 --pfile "${plink2out}"/"${project}"_temp_7 --exclude "${WHI_SHARE_aa_cb_p2o}"/inversion.txt --indep-pairwise 50 5 0.2 --out "${plink2out}"/"${project}"_indepSNP
+
+plink2 --pfile "${plink2out}"/"${project}"_temp_7 --extract "${WHI_SHARE_aa_cb_p2o}"/indepSNP.prune.in --het --out "${WHI_SHARE_aa_cb_p2o}"/WHI_SHARE_aa_R_check
