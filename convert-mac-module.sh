@@ -18,17 +18,18 @@ shift $((OPTIND -1))
 # Define base directory:
 dataset_base_dir=$HOME/SAP2-GWAS/datasets/
 
-#
-dataset1=${dataset_base_dir}/dataset
 
 # project name - for naming files
 project=TEST
 
+# consent groups not just to but equal to n that the user inputs
 c1_dataset_dir=$HOME/indir_1
 c2_dataset_dir=$HOME/indir_2
+#... etc etc to how many they have
 
-# an array containing the consent groups
+# an array containing the all consent groups that the user input so that commands are carried out on the array
 consent_groups=(c1_dataset_dir, c2_dataset_dir...etc)
+
 
 # out directory for the combined files
 cb_dataset_dir=$HOME/outdir_cb
