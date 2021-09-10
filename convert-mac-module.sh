@@ -46,7 +46,6 @@ cb_dataset_dir=$HOME/outdir_cb
 
 
 
-
 # Concatenate consent groups
 for i in "${consent_groups[@]}"; do
   for ((j=1; j<=22; j++)); do
@@ -62,7 +61,6 @@ for ((i=1; i<=22; j++)); do
   echo "Copying ${project} info file for for chromosome ${i}"
   cp "${consent_groups[0]}"/*chr"${i}"*.info* "${cb_dataset_dir}"/"${project}"_chr"${i}".info
 done
-
 
 
 
@@ -117,8 +115,6 @@ done
 
 
 
-
-
 ## Step 4: Convert MaCH or minimac input files into plink compatible dosage files ##
 
 
@@ -138,8 +134,6 @@ echo "Completed dose2plink conversion"
 
 
 
-
-
 ## Step 5: Combine the chromosomes for each dataset into a single file ##
 
 # The pdat files for each chromosome need to be combined into a single file.
@@ -149,13 +143,3 @@ for ((i=2; i<=22; i++)); do
     echo "Doing "${project}"_chr${i}"
     cat "${dose2plinkout}"/"${project}"_chr"${i}".pdat | tail -n +2 >> "${dose2plinkout}"/"${project}"_allchr.pdat
 done
-
-
-
-
-
-## Step 2.8: Generate map file ##
-
-  # A MAP file for our dataset (which contains a list of SNPs and their location) must be created for use with PLINK (see https://zzz.bwh.harvard.edu/plink/data.shtml#map).
-
-awk '{print 0,$1,0,0}' "${dose2plinkout}"/"${project}"_allchr.pdat > "${dose2plinkout}"/"${project}".map
