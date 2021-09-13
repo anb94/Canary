@@ -35,6 +35,9 @@ consent_groups=(c1_dataset_dir, c2_dataset_dir...etc)
 cb_dataset_dir=$HOME/outdir_cb
 
 
+mkdir "${cb_dataset_dir}"/"${project}"_dose2plinkout
+dose2plinkout="${cb_dataset_dir}"/"${project}"_dose2plinkout
+
 ########################################################################
 
 
@@ -123,8 +126,6 @@ done
 
   # Use the dose2plink to convert .dose and .info to .pdat and .pfam:
 
-mkdir "${cb_dataset_dir}"/"${project}"_dose2plinkout
-dose2plinkout="${cb_dataset_dir}"/"${project}"_dose2plinkout
 
 for ((i=10; i<=22; i++)); do
     echo "Converting .info and .dose for Chromosome ${i}"

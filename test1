@@ -165,9 +165,12 @@ done
 
 
 
-## Step 2.6: Correct the gender for the pfam files produced ##
+## Step 2.6: Correct the gender for the pfam files produced ##############
 
-  ### IMPORTANT NOTE ###
+
+  ####################### --------- IMPORTANT NOTE --------- #######################
+
+
   ### This step is altering the 'sex' column to '2' which is female. This is specific to the data set I used because they are all female.
   ### For a more generic use we need to find another way to do this based on information provided elsewhere in the dataset.
 
@@ -182,6 +185,8 @@ done
 
 cp "${dose2plinkout}"/"${project}"_chr1.pfam "${dose2plinkout}"/"${project}"_allchr.pfam
 
+
+  ####################### ---------               --------- #######################
 
 
 
