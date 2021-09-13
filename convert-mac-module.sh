@@ -95,32 +95,40 @@ printf "\nBase directory: $base_dir\n\n"
 # done
 #######################################
 
+# create directory if doesn't already exist
+if [[ "${out_dir: -1}" == "/" ]]
+then
+	# check for trailing slash and remove
+	$out_dir="${outidr%?}"
+fi
+dose2plinkout="${out_dir}/${name}_dose2plinkout"
+mkdir -p dose2plinkout
+printf "Using output directory: $dose2plinkout"
+
+
 
 
 # OPTIONS ARE TO CREATE THE FOLLOWING:
 
 # Define base directory:
-dataset_base_dir=$HOME/SAP2-GWAS/datasets/
+# dataset_base_dir=$HOME/SAP2-GWAS/datasets/
 
 
 # project name - for naming files
-project=TEST
+# project=TEST
 
-# consent groups not just to but equal to n that the user inputs
-c1_dataset_dir=$HOME/indir_1
-c2_dataset_dir=$HOME/indir_2
+# # consent groups not just to but equal to n that the user inputs
+# c1_dataset_dir=$HOME/indir_1
+# c2_dataset_dir=$HOME/indir_2
 #... etc etc to how many they have
 
 # an array containing the all consent groups that the user input so that commands are carried out on the array
-consent_groups=(c1_dataset_dir, c2_dataset_dir...etc)
-
+# consent_groups=(c1_dataset_dir, c2_dataset_dir...etc)
 
 # out directory for the combined files
-cb_dataset_dir=$HOME/outdir_cb
+# cb_dataset_dir=$HOME/outdir_cb
 
 
-mkdir "${cb_dataset_dir}"/"${project}"_dose2plinkout
-dose2plinkout="${cb_dataset_dir}"/"${project}"_dose2plinkout
 
 ########################################################################
 
