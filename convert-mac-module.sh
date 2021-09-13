@@ -5,10 +5,8 @@ Help()
    # Display help
     printf "
     This script does something, I'm not entirely sure what, but it's definitely
-    something to do with science. And data. GWAS, more like GWHAT.\n
-    "
-    echo "Usage:"
-    echo ""
+    something to do with science. And data. GWAS, more like GWHAT.\n\n"
+    printf "Usage:\n\n"
     echo "-c    Directories containing consent data, pass once per directory."
     echo "-n    Output naming prefix, for naming things."
     echo "-o    Output directory, for outputting data."
@@ -17,6 +15,7 @@ Help()
     echo ""
 }
 
+# input arguments
 while getopts ":c:n:o:b:h" option;
 do
    case $option in
@@ -62,7 +61,7 @@ do
     fi        
 done
 
-# sense check given consent directories exist, can check for correct data etc.
+# sense check given consent directories exist, can also check for correct data etc.
 for dir in "${consent_dir[@]}"
 do
     if [ ! -d "$dir" ]
@@ -88,7 +87,7 @@ printf "\nBase directory: $base_dir\n\n"
 
 
 #######################################
-## access elements of the array like this
+## you access elements of the array like this xo
 
 # for dir in "${consent_dir[@]}"; do
 #     echo "$dir"
@@ -127,8 +126,6 @@ printf "Using output directory: $dose2plinkout"
 
 # out directory for the combined files
 # cb_dataset_dir=$HOME/outdir_cb
-
-
 
 ########################################################################
 
