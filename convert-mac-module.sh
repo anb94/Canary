@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#### THIS SCRIPT NEEDS A DOC STRING HERE TO EXPLAIN WHAT IT DOES
+
 Help()
 {
    # Display help
