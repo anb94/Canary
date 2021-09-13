@@ -1,19 +1,103 @@
 #!/bin/bash
 
-########################################################################
+Help()
+{
+   # Display help
+    printf "
+    This script does something, I'm not entirely sure what, but it's definitely
+    something to do with science. And data. GWAS, more like GWHAT.\n
+    "
+    echo "Usage:"
+    echo ""
+    echo "-c    Directories containing consent data, pass once per directory."
+    echo "-n    Output naming prefix, for naming things."
+    echo "-o    Output directory, for outputting data."
+    echo "-b    Base directory, the directory of the base."
+    echo "-h    Print this help."
+    echo ""
+}
 
-# JETHRO CREATE INPUT HERE
-
-while getopts "m:" opt; do
-    case $opt in
-        m) multi+=("$OPTARG");;
-        #...
-    esac
+while getopts ":c:n:o:b:h" option;
+do
+   case $option in
+        c)
+            consent_dir+=("$OPTARG")
+            ;;
+        n)
+            name="$OPTARG"
+            ;;
+        o)
+            out_dir="$OPTARG"
+            ;;
+        b)
+            base_dir="$OPTARG"
+            ;;
+        h)
+            Help
+            exit 1
+            ;;
+        \?)
+            printf "\nInvalid option passed: -$OPTARG. See usage below.\n"
+            Help
+            exit 1
+            ;;
+   esac
 done
-shift $((OPTIND -1))
+
+# display help on passing no arguments
+if [ $OPTIND -eq 1 ];
+then
+    Help
+    exit 1
+fi
+
+# check all args given
+for arg in "$consent_dir" "$name" "$out_dir" "$base_dir"
+do
+    if [ -n "${!arg}" ]
+    then
+        printf "Error: Missing argument(s). See usage below."
+        Help
+        exit 1
+    fi        
+done
+
+# sense check given consent directories exist, can check for correct data etc.
+for dir in "${consent_dir[@]}"
+do
+    if [ ! -d "$dir" ]
+    then
+        printf "\n\" $dir \" does not seem to be a valid directory, "
+        printf "please check the directories passed with -c\n\n"
+        exit 1
+    fi
+done
+
+# display a helpful message of inputs
+printf "\nUsing specified arguments:\n"
+printf "\nConsent directories:\n"
+
+for dir in "${consent_dir[@]}"
+do
+    printf "\t $dir"
+done
+
+printf "\n\nName prefix: $name"
+printf "\nOutput directory: $out_dir"
+printf "\nBase directory: $base_dir\n\n"
+
+
+#######################################
+## access elements of the array like this
+
+# for dir in "${consent_dir[@]}"; do
+#     echo "$dir"
+# done
+#######################################
+
+
 
 # OPTIONS ARE TO CREATE THE FOLLOWING:
-
 
 # Define base directory:
 dataset_base_dir=$HOME/SAP2-GWAS/datasets/
