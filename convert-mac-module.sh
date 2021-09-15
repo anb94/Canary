@@ -12,13 +12,12 @@ Help()
     echo "-c    Directories containing consent data, pass once per directory."
     echo "-n    Project output naming prefix, for naming things."
     echo "-o    Output directory, for outputting data."
-    echo "-b    Base directory, the directory of the base."
     echo "-h    Print this help."
     echo ""
 }
 
 # input arguments
-while getopts ":c:n:o:b:h" option;
+while getopts ":c:n:o:h" option;
 do
    case $option in
         c)
@@ -29,9 +28,6 @@ do
             ;;
         o)
             out_dir="$OPTARG"
-            ;;
-        b)
-            base_dir="$OPTARG"
             ;;
         h)
             Help
@@ -53,7 +49,7 @@ then
 fi
 
 # check all args given
-for arg in "$consent_groups" "$project" "$out_dir" "$base_dir"
+for arg in "$consent_groups" "$project" "$out_dir"
 do
     if [ -n "${!arg}" ]
     then
@@ -85,16 +81,7 @@ done
 
 printf "\n\nName prefix: $project"
 printf "\nOutput directory: $out_dir"
-printf "\nBase directory: $base_dir\n\n"
 
-
-#######################################
-## you access elements of the array like this xo
-
-# for dir in "${consent_groups[@]}"; do
-#     echo "$dir"
-# done
-#######################################
 
 # create directory if doesn't already exist
 if [[ "${out_dir: -1}" == "/" ]]
@@ -102,42 +89,16 @@ then
 	# check for trailing slash and remove
 	$out_dir="${outidr%?}"
 fi
+
 dose2plinkout="${out_dir}/${name}_dose2plinkout"
 mkdir -p dose2plinkout
 printf "Using output directory: $dose2plinkout"
-
-
-
-
-# OPTIONS ARE TO CREATE THE FOLLOWING:
-
-# Define base directory:
-# dataset_base_dir=$HOME/SAP2-GWAS/datasets/
-
-
-# project name - for naming files
-# project=TEST
-
-# # consent groups not just to but equal to n that the user inputs
-# c1_dataset_dir=$HOME/indir_1
-# c2_dataset_dir=$HOME/indir_2
-#... etc etc to how many they have
-
-# an array containing the all consent groups that the user input so that commands are carried out on the array
-# consent_groups=(c1_dataset_dir, c2_dataset_dir...etc)
-
-# out directory for the combined files
-# out_dir=$HOME/outdir_cb
-
-########################################################################
-
 
 
 # Prepare genotype data #
 
 
 ## Step 1: Combine datasets ##
-
 
 
 # Concatenate consent groups
