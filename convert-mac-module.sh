@@ -10,7 +10,7 @@ Help()
     something to do with science. And data. GWAS, more like GWHAT.\n\n"
     printf "Usage:\n\n"
     echo "-c    Directories containing consent data, pass once per directory."
-    echo "-n    Output naming prefix, for naming things."
+    echo "-n    Project output naming prefix, for naming things."
     echo "-o    Output directory, for outputting data."
     echo "-b    Base directory, the directory of the base."
     echo "-h    Print this help."
@@ -22,10 +22,10 @@ while getopts ":c:n:o:b:h" option;
 do
    case $option in
         c)
-            consent_dir+=("$OPTARG")
+            consent_groups+=("$OPTARG")
             ;;
         n)
-            name="$OPTARG"
+            project="$OPTARG"
             ;;
         o)
             out_dir="$OPTARG"
@@ -53,7 +53,7 @@ then
 fi
 
 # check all args given
-for arg in "$consent_dir" "$name" "$out_dir" "$base_dir"
+for arg in "$consent_groups" "$project" "$out_dir" "$base_dir"
 do
     if [ -n "${!arg}" ]
     then
@@ -64,7 +64,7 @@ do
 done
 
 # sense check given consent directories exist, can also check for correct data etc.
-for dir in "${consent_dir[@]}"
+for dir in "${consent_groups[@]}"
 do
     if [ ! -d "$dir" ]
     then
@@ -78,12 +78,12 @@ done
 printf "\nUsing specified arguments:\n"
 printf "\nConsent directories:\n"
 
-for dir in "${consent_dir[@]}"
+for dir in "${consent_groups[@]}"
 do
     printf "\t $dir"
 done
 
-printf "\n\nName prefix: $name"
+printf "\n\nName prefix: $project"
 printf "\nOutput directory: $out_dir"
 printf "\nBase directory: $base_dir\n\n"
 
@@ -91,7 +91,7 @@ printf "\nBase directory: $base_dir\n\n"
 #######################################
 ## you access elements of the array like this xo
 
-# for dir in "${consent_dir[@]}"; do
+# for dir in "${consent_groups[@]}"; do
 #     echo "$dir"
 # done
 #######################################
@@ -127,7 +127,7 @@ printf "Using output directory: $dose2plinkout"
 # consent_groups=(c1_dataset_dir, c2_dataset_dir...etc)
 
 # out directory for the combined files
-# cb_dataset_dir=$HOME/outdir_cb
+# out_dir=$HOME/outdir_cb
 
 ########################################################################
 
@@ -144,7 +144,7 @@ printf "Using output directory: $dose2plinkout"
 for i in "${consent_groups[@]}"; do
   for ((j=1; j<=22; j++)); do
     echo "Concatenating ${project} consent group ${i} for chromosome ${j}"
-    cat "${i}"/*chr"${j}"*.dose* >> "${cb_dataset_dir}"/"${project}"_chr"${j}".dose
+    cat "${i}"/*chr"${j}"*.dose* >> "${out_dir}"/"${project}"_chr"${j}".dose
   done
 done
 echo "Completed Concatenating ${project} Consent Groups"
@@ -153,7 +153,7 @@ echo "Completed Concatenating ${project} Consent Groups"
 # As all info files in the study should be identical, copy info files from only one consent group
 for ((i=1; i<=22; j++)); do
   echo "Copying ${project} info file for for chromosome ${i}"
-  cp "${consent_groups[0]}"/*chr"${i}"*.info* "${cb_dataset_dir}"/"${project}"_chr"${i}".info
+  cp "${consent_groups[0]}"/*chr"${i}"*.info* "${out_dir}"/"${project}"_chr"${i}".info
 done
 
 
@@ -164,8 +164,8 @@ for ((i=1; i<=22; i++)); do
   echo "Generating low quality SNPs"
   echo "Doing Chromosome number ${i}"
 
-  awk '{if ($7 < 0.3) print $1}' "${cb_dataset_dir}"/"${project}"_chr"${i}".dose > "${cb_dataset_dir}"/"${project}"_chr"${i}"_lq03_snps.txt
-  awk '{if ($7 < 0.8) print $1}' "${cb_dataset_dir}"/"${project}"_chr"${i}".dose > "${cb_dataset_dir}"/"${project}"_chr"${i}"_lq08_snps.txt
+  awk '{if ($7 < 0.3) print $1}' "${out_dir}"/"${project}"_chr"${i}".dose > "${out_dir}"/"${project}"_chr"${i}"_lq03_snps.txt
+  awk '{if ($7 < 0.8) print $1}' "${out_dir}"/"${project}"_chr"${i}".dose > "${out_dir}"/"${project}"_chr"${i}"_lq08_snps.txt
 done
 
 echo "Completed Generating low quality SNPs"
@@ -176,18 +176,18 @@ echo "Completed Generating low quality SNPs"
 # Append the low qual 0.3 snp files to a combined file
 for ((i=1; i<=22; i++)); do
   echo "Doing lq03 ${i}"
-  cat "${cb_dataset_dir}"/"${project}"_chr"${i}"_lq03_snps.txt >> "${cb_dataset_dir}"/"${project}"_all_chr_lq03_snps.txt
+  cat "${out_dir}"/"${project}"_chr"${i}"_lq03_snps.txt >> "${out_dir}"/"${project}"_all_chr_lq03_snps.txt
 done
 
 # Append the low qual 0.8 snp files to a combined file
 for ((i=1; i<=22; i++)); do
   echo "Doing lq03 ${i}"
-  cat "${cb_dataset_dir}"/"${project}"_chr"${i}"_lq08_snps.txt >> "${cb_dataset_dir}"/"${project}"_all_chr_lq08_snps.txt
+  cat "${out_dir}"/"${project}"_chr"${i}"_lq08_snps.txt >> "${out_dir}"/"${project}"_all_chr_lq08_snps.txt
 done
 
 
-cat "${cb_dataset_dir}"/"${project}"_all_chr_lq03_snps.txt > "${cb_dataset_dir}"/"${project}"_all_chr_lq_all_snps.txt
-cat "${cb_dataset_dir}"/"${project}"_all_chr_lq08_snps.txt >> "${cb_dataset_dir}"/"${project}"_all_chr_lq_all_snps.txt
+cat "${out_dir}"/"${project}"_all_chr_lq03_snps.txt > "${out_dir}"/"${project}"_all_chr_lq_all_snps.txt
+cat "${out_dir}"/"${project}"_all_chr_lq08_snps.txt >> "${out_dir}"/"${project}"_all_chr_lq_all_snps.txt
 
 
 
@@ -202,9 +202,9 @@ cat "${cb_dataset_dir}"/"${project}"_all_chr_lq08_snps.txt >> "${cb_dataset_dir}
 
 for ((i=1; i<=22; i++)); do
   echo "Doing Chromosome ${i}"
-  info=$(awk 'END{print NR}' "${cb_dataset_dir}"/"${project}"_chr"${i}".info)
-  dose=$(awk 'END{print NF}'  "${cb_dataset_dir}"/"${project}"_chr"${i}".dose)
-  echo "Chromosome ${i} info has ${info} rows and dose has ${dose} columns"  >> "${cb_dataset_dir}"/"${project}"_qc-checklength.log
+  info=$(awk 'END{print NR}' "${out_dir}"/"${project}"_chr"${i}".info)
+  dose=$(awk 'END{print NF}'  "${out_dir}"/"${project}"_chr"${i}".dose)
+  echo "Chromosome ${i} info has ${info} rows and dose has ${dose} columns"  >> "${out_dir}"/"${project}"_qc-checklength.log
 done
 
 
@@ -220,7 +220,7 @@ done
 
 for ((i=10; i<=22; i++)); do
     echo "Converting .info and .dose for Chromosome ${i}"
-    dose2plink -m 7000 -dose "${cb_dataset_dir}"/"${project}"_chr"${i}".dose -info "${cb_dataset_dir}"/"${project}"_chr"${i}".info -gz 0 -out "${dose2plinkout}"/"${project}"_chr"${i}"
+    dose2plink -m 7000 -dose "${out_dir}"/"${project}"_chr"${i}".dose -info "${out_dir}"/"${project}"_chr"${i}".info -gz 0 -out "${dose2plinkout}"/"${project}"_chr"${i}"
 done
 echo "Completed dose2plink conversion"
 
