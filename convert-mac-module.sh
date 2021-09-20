@@ -1,13 +1,13 @@
 #!/bin/bash
 
 #### THIS SCRIPT NEEDS A DOC STRING HERE TO EXPLAIN WHAT IT DOES
+# This script will combine MaCH and minimac imputed data for consent groups from the same study. For example, it can combine the two consent groups of WHI SHARE data available from dbGaP.
 
 Help()
 {
    # Display help
     printf "
-    This script does something, I'm not entirely sure what, but it's definitely
-    something to do with science. And data. GWAS, more like GWHAT.\n\n"
+    This script combines MaCH and minimac imputed data for consent groups from the same study.\n\n"
     printf "Usage:\n\n"
     echo "-c    Directories containing consent data, pass once per directory."
     echo "-n    Project output naming prefix, for naming things."
@@ -56,7 +56,7 @@ do
         printf "Error: Missing argument(s). See usage below."
         Help
         exit 1
-    fi        
+    fi
 done
 
 # sense check given consent directories exist, can also check for correct data etc.
@@ -172,12 +172,7 @@ done
 
 ## Step 4: Convert MaCH or minimac input files into plink compatible dosage files ##
 
-
-  # This step needs to be performed on a machine/container which has installed dose2plink.c
-  # A singularity definition file which includes dose2plink.c can be found at https://github.com/anb94/gwas_pancan/blob/master/singularity_images/custom_singularity_images/canary_v4.def
-
-  # Use the dose2plink to convert .dose and .info to .pdat and .pfam:
-
+# Use the dose2plink to convert .dose and .info to .pdat and .pfam:
 
 for ((i=10; i<=22; i++)); do
     echo "Converting .info and .dose for Chromosome ${i}"
