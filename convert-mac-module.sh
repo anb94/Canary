@@ -60,15 +60,15 @@ do
 done
 
 # sense check given consent directories exist, can also check for correct data etc.
-for dir in "${consent_groups[@]}"
-do
-    if [ ! -d "$dir" ]
-    then
-        printf "\n\" $dir \" does not seem to be a valid directory, "
-        printf "please check the directories passed with -c\n\n"
-        exit 1
-    fi
-done
+#for dir in "${consent_groups[@]}"
+#do
+#    if [ ! -d "$dir" ]
+#    then
+#        printf "\n\" $dir \" does not seem to be a valid directory, "
+#        printf "please check the directories passed with -c\n\n"
+#        exit 1
+#    fi
+#done
 
 # display a helpful message of inputs
 printf "\nUsing specified arguments:\n"
@@ -90,7 +90,7 @@ then
 	$out_dir="${outidr%?}"
 fi
 
-dose2plinkout="${out_dir}/${name}_dose2plinkout"
+dose2plinkout="${out_dir}/${project}_dose2plinkout"
 mkdir -p dose2plinkout
 printf "Using output directory: $dose2plinkout"
 
