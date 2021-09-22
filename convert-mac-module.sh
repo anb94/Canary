@@ -100,25 +100,57 @@ printf "Using output directory: $dose2plinkout"
 
 ## Step 1: Combine datasets ##
 
-# regex to find the info files grep '/.{0,}(?:chr)\d{1,2}.{0,}\.(info)$/gm' - NOTE needs to be done for the dose file too which isnt necesarrily ending in .dose
+# regex to find the info files grep '/.{0,}(?:chr)\d{1,2}.{0,}\.(info)$/gm'
+#- NOTE needs to be done for the dose file too which isnt necesarrily ending in .dose
 # may be .dose.c1 or .dose.c2 etc depending on consent group
 
 # Concatenate consent groups
 for i in "${consent_groups[@]}"; do
   for ((j=1; j<=22; j++)); do
+    # for all consent groups find each chromosome .dose file and 
+    # add all consent groups chromsome file contents to a single .dose file 
     echo "Concatenating ${project} consent group ${i} for chromosome ${j}"
-    cat "${i}"/*chr"${j}"[a-z]*.dose* >> "${out_dir}"/"${project}"_chr"${j}".dose
+  
+    chr_dose_file=$(find -E "${i}" -iregex ".*chr${j}.dose(\.)?[a-z0-9]*$")
+
+    # sense check only 1 file found, decide how to handle more later
+    if [ $(echo "$files" | wc -w) >  1 ]
+    then
+		printf "Found more than one .dose file for chromosome ${j} in ${consent_groups[0]}\n"
+		printf "${chr_info_file}"
+		printf "Should probably do something about this as there should be one"
+    fi
+
+    # define file to add contents to
+    combined_dose_file="${out_dir}/${project}_chr${j}.dose"
+
+    cat $chr_dose_file >> $combined_dose_file
   done
 done
 echo "Completed Concatenating ${project} Consent Groups"
 
 
-# As all info files in the study should be identical, copy info files from only one consent group
+# As all info files in the study should be identical, copy info files
+# from only first consent group
 for ((i=1; i<=22; i++)); do
   echo "Copying ${project} info file for for chromosome ${i}"
-  cp "${consent_groups[0]}"/*chr"${i}"[a-z]*.info* "${out_dir}""${project}"_chr"${i}".info
-done
 
+    # find file for given chromosome in consent group dir
+    chr_info_file=$(find -E "${consent_groups[0]}" -iregex ".*chr${j}.info$")
+
+    # sense check only 1 file found, decide how to handle more later
+    if [ $(echo "$files" | wc -w) >  1 ]
+    then
+		printf "Found more than one .info file for chromosome ${j} in ${consent_groups[0]}\n"
+		printf "${chr_info_file}"
+		printf "Should probably do something about this as there should be one"
+    fi
+
+    # set destination dir to be specified out dir and name by project and chromosome
+    destination="${out_dir}/${project}_chr${j}.info"
+
+    cp "$chr_info_file" "$destination"
+done
 
 
 ## Step 2: Identify low quality Quality SNPs ##
@@ -153,8 +185,6 @@ cat "${out_dir}"/"${project}"_all_chr_lq03_snps.txt > "${out_dir}"/"${project}"_
 cat "${out_dir}"/"${project}"_all_chr_lq08_snps.txt >> "${out_dir}"/"${project}"_all_chr_lq_all_snps.txt
 
 
-
-
 ## Step 3: Check input file dimensions Quality control ##
 
 
@@ -183,8 +213,6 @@ for ((i=1; i<=22; i++)); do
 done
 
 echo "Completed dose2plink conversion"
-
-
 
 
 ## Step 5: Combine the chromosomes for each dataset into a single file ##
