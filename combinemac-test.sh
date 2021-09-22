@@ -25,7 +25,7 @@ echo "Completed Concatenating ${project} Consent Groups"
 
 
 # As all info files in the study should be identical, copy info files from only one consent group
-for ((i=1; i<=22; j++)); do
+for ((i=1; i<=22; i++)); do
   echo "Copying ${project} info file for for chromosome ${i}"
   cp "${consent_groups[0]}"/*chr"${i}"*.info* "${out_dir}"/"${project}"_chr"${i}".info
 done
@@ -38,8 +38,8 @@ for ((i=1; i<=22; i++)); do
   echo "Generating low quality SNPs"
   echo "Doing Chromosome number ${i}"
 
-  awk '{if ($7 < 0.3) print $1}' "${out_dir}"/"${project}"_chr"${i}".dose > "${out_dir}"/"${project}"_chr"${i}"_lq03_snps.txt
-  awk '{if ($7 < 0.8) print $1}' "${out_dir}"/"${project}"_chr"${i}".dose > "${out_dir}"/"${project}"_chr"${i}"_lq08_snps.txt
+  awk '{if ($7 < 0.3) print $1}' "${out_dir}"/"${project}"_chr"${i}".info > "${out_dir}"/"${project}"_chr"${i}"_lq03_snps.txt
+  awk '{if ($7 < 0.8) print $1}' "${out_dir}"/"${project}"_chr"${i}".info > "${out_dir}"/"${project}"_chr"${i}"_lq08_snps.txt
 done
 
 echo "Completed Generating low quality SNPs"
@@ -73,12 +73,13 @@ cat "${out_dir}"/"${project}"_all_chr_lq08_snps.txt >> "${out_dir}"/"${project}"
 # This information will be retreived using awk and stored in a log file within the ethnicities directory.
 
 #### NOTE ---- CHANGE THIS TO ASK DO THEY EQUAL eachother with n-1 since one has header as a QC
+# Chromosome '2' info has '1765129' rows and dose has '1765130' columns  columns is 1 more than rows
 
 for ((i=1; i<=22; i++)); do
   echo "Doing Chromosome ${i}"
-  info=$(awk 'END{print NR}' "${out_dir}"/"${project}"_chr"${i}".info)
-  dose=$(awk 'END{print NF}'  "${out_dir}"/"${project}"_chr"${i}".dose)
-  echo "Chromosome ${i} info has ${info} rows and dose has ${dose} columns"  >> "${out_dir}"/"${project}"_qc-checklength.log
+  info=$(gawk 'END{print NR}' "${out_dir}"/"${project}"_chr"${i}".info)
+  dose=$(gawk 'END{print NF}' "${out_dir}"/"${project}"_chr"${i}".dose)
+  echo "Chromosome '${i}' info has '${info}' rows and dose has '${dose}' columns"  >> "${out_dir}"/"${project}"_qc-checklength.log
 done
 
 
@@ -87,7 +88,7 @@ done
 
 # Use the dose2plink to convert .dose and .info to .pdat and .pfam:
 
-for ((i=10; i<=22; i++)); do
+for ((i=1; i<=22; i++)); do
     echo "Converting .info and .dose for Chromosome ${i}"
     dose2plink -m 7000 -dose "${out_dir}"/"${project}"_chr"${i}".dose -info "${out_dir}"/"${project}"_chr"${i}".info -gz 0 -out "${dose2plinkout}"/"${project}"_chr"${i}"
 done

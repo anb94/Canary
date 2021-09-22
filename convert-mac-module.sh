@@ -105,7 +105,7 @@ printf "Using output directory: $dose2plinkout"
 for i in "${consent_groups[@]}"; do
   for ((j=1; j<=22; j++)); do
     echo "Concatenating ${project} consent group ${i} for chromosome ${j}"
-    cat "${i}"/*chr"${j}"*.dose* >> "${out_dir}"/"${project}"_chr"${j}".dose
+    cat "${i}"/*chr"${j}"[a-z]*.dose* >> "${out_dir}"/"${project}"_chr"${j}".dose
   done
 done
 echo "Completed Concatenating ${project} Consent Groups"
@@ -142,7 +142,7 @@ done
 
 # Append the low qual 0.8 snp files to a combined file
 for ((i=1; i<=22; i++)); do
-  echo "Doing lq03 ${i}"
+  echo "Doing lq08 ${i}"
   cat "${out_dir}"/"${project}"_chr"${i}"_lq08_snps.txt >> "${out_dir}"/"${project}"_all_chr_lq08_snps.txt
 done
 
@@ -160,12 +160,13 @@ cat "${out_dir}"/"${project}"_all_chr_lq08_snps.txt >> "${out_dir}"/"${project}"
 # This information will be retreived using awk and stored in a log file within the ethnicities directory.
 
 #### NOTE ---- CHANGE THIS TO ASK DO THEY EQUAL eachother with n-1 since one has header as a QC
+# e.g. Chromosome '2' info has '1765129' rows and dose has '1765130' columns  columns is 1 more than rows
 
 for ((i=1; i<=22; i++)); do
   echo "Doing Chromosome ${i}"
-  info=$(awk 'END{print NR}' "${out_dir}"/"${project}"_chr"${i}".info)
-  dose=$(awk 'END{print NF}'  "${out_dir}"/"${project}"_chr"${i}".dose)
-  echo "Chromosome ${i} info has ${info} rows and dose has ${dose} columns"  >> "${out_dir}"/"${project}"_qc-checklength.log
+  info=$(gawk 'END{print NR}' "${out_dir}"/"${project}"_chr"${i}".info)
+  dose=$(gawk 'END{print NF}' "${out_dir}"/"${project}"_chr"${i}".dose)
+  echo "Chromosome '${i}' info has '${info}' rows and dose has '${dose}' columns"  >> "${out_dir}"/"${project}"_qc-checklength.log
 done
 
 
@@ -174,11 +175,13 @@ done
 
 # Use the dose2plink to convert .dose and .info to .pdat and .pfam:
 
-for ((i=10; i<=22; i++)); do
+for ((i=1; i<=22; i++)); do
     echo "Converting .info and .dose for Chromosome ${i}"
     dose2plink -m 7000 -dose "${out_dir}"/"${project}"_chr"${i}".dose -info "${out_dir}"/"${project}"_chr"${i}".info -gz 0 -out "${dose2plinkout}"/"${project}"_chr"${i}"
 done
+
 echo "Completed dose2plink conversion"
+
 
 
 
