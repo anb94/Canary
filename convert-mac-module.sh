@@ -136,18 +136,18 @@ for ((i=1; i<=22; i++)); do
   echo "Copying ${project} info file for for chromosome ${i}"
 
     # find file for given chromosome in consent group dir
-    chr_info_file=$(find -E "${consent_groups[0]}" -iregex ".*chr${j}.info$")
+    chr_info_file=$(find -E "${consent_groups[0]}" -iregex ".*chr${i}.info$")
 
     # sense check only 1 file found, decide how to handle more later
     if [ $(echo "$files" | wc -w) >  1 ]
     then
-		printf "Found more than one .info file for chromosome ${j} in ${consent_groups[0]}\n"
+		printf "Found more than one .info file for chromosome ${i} in ${consent_groups[0]}\n"
 		printf "${chr_info_file}"
 		printf "Should probably do something about this as there should be one"
     fi
 
     # set destination dir to be specified out dir and name by project and chromosome
-    destination="${out_dir}/${project}_chr${j}.info"
+    destination="${out_dir}/${project}_chr${i}.info"
 
     cp "$chr_info_file" "$destination"
 done
