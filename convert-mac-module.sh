@@ -100,6 +100,7 @@ printf "Using output directory: $dose2plinkout"
 
 ## Step 1: Combine datasets ##
 
+# regex to find the info files grep '/.{0,}(?:chr)\d{1,2}.{0,}\.(info)$/gm' - NOTE needs to be done for the dose file too which isnt necesarrily 
 
 # Concatenate consent groups
 for i in "${consent_groups[@]}"; do
