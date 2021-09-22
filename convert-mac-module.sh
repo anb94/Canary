@@ -125,8 +125,8 @@ for ((i=1; i<=22; i++)); do
   echo "Generating low quality SNPs"
   echo "Doing Chromosome number ${i}"
 
-  awk '{if ($7 < 0.3) print $1}' "${out_dir}"/"${project}"_chr"${i}".dose > "${out_dir}"/"${project}"_chr"${i}"_lq03_snps.txt
-  awk '{if ($7 < 0.8) print $1}' "${out_dir}"/"${project}"_chr"${i}".dose > "${out_dir}"/"${project}"_chr"${i}"_lq08_snps.txt
+  awk '{if ($7 < 0.3) print $1}' "${out_dir}"/"${project}"_chr"${i}".info > "${out_dir}"/"${project}"_chr"${i}"_lq03_snps.txt
+  awk '{if ($7 < 0.8) print $1}' "${out_dir}"/"${project}"_chr"${i}".info > "${out_dir}"/"${project}"_chr"${i}"_lq08_snps.txt
 done
 
 echo "Completed Generating low quality SNPs"
