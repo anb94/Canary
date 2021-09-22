@@ -112,9 +112,9 @@ echo "Completed Concatenating ${project} Consent Groups"
 
 
 # As all info files in the study should be identical, copy info files from only one consent group
-for ((i=1; i<=22; j++)); do
+for ((i=1; i<=22; i++)); do
   echo "Copying ${project} info file for for chromosome ${i}"
-  cp "${consent_groups[0]}"/*chr"${i}"*.info* "${out_dir}"/"${project}"_chr"${i}".info
+  cp "${consent_groups[0]}"/*chr"${i}"[a-z]*.info* "${out_dir}""${project}"_chr"${i}".info
 done
 
 
