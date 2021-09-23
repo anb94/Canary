@@ -179,7 +179,7 @@ done
 
 for ((i=1; i<=22; i++)); do
     echo "Converting .info and .dose for Chromosome ${i}"
-    dose2plink -m 7000 -dose "${out_dir}"/"${project}"_chr"${i}".dose -info "${out_dir}"/"${project}"_chr"${i}".info -gz 0 -out "${dose2plinkout}"/"${project}"_chr"${i}"
+    dose2plink -m 15000 --dose "${out_dir}"/"${project}"_chr"${i}".dose --info "${out_dir}"/"${project}"_chr"${i}".info -gz 0 --out "${dose2plinkout}"/"${project}"_chr"${i}"
 done
 
 echo "Completed dose2plink conversion"
