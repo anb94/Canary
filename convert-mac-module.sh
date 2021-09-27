@@ -107,11 +107,11 @@ printf "Using output directory: $dose2plinkout"
 # Concatenate consent groups
 for i in "${consent_groups[@]}"; do
   for ((j=1; j<=22; j++)); do
-    # for all consent groups find each chromosome .dose file and 
-    # add all consent groups chromsome file contents to a single .dose file 
+    # for all consent groups find each chromosome .dose file and
+    # add all consent groups chromsome file contents to a single .dose file
     echo "Concatenating ${project} consent group ${i} for chromosome ${j}"
-  
-    chr_dose_file=$(find -E "${i}" -iregex ".*chr${j}.dose(\.)?[a-z0-9]*$")
+
+    chr_dose_file=$(find -regextype posix-extended "${i}" -iregex ".*chr${j}.dose(\.)?[a-z0-9]*$")
 
     # sense check only 1 file found, decide how to handle more later
     if [ $(echo "$files" | wc -w) >  1 ]

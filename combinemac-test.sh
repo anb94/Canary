@@ -3,10 +3,9 @@ consent1=/home/anbennett2/scratch/datasets/raw_data/dbgap_data/746/c1/phg000592.
 consent2=/home/anbennett2/scratch/datasets/raw_data/dbgap_data/746/c2/phg000592.v1.WHIMS.genotype-imputed-data.c2/
 
 consent_groups=()
-consent_groups+=(${consent1})
-consent_groups+=(${consent2})
 consent_groups=(${consent1} ${consent2})
 out_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/
+dose2plinkout=/scratch/anbennett2/datasets/processed_data/dbgap/WHI/dose2plinkout/
 
 # Prepare genotype data #
 
