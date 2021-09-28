@@ -105,28 +105,41 @@ printf "Using output directory: $dose2plinkout"
 # may be .dose.c1 or .dose.c2 etc depending on consent group
 
 # Concatenate consent groups
+
+
+# Concatenate consent groups
 for i in "${consent_groups[@]}"; do
   for ((j=1; j<=22; j++)); do
-    # for all consent groups find each chromosome .dose file and
-    # add all consent groups chromsome file contents to a single .dose file
     echo "Concatenating ${project} consent group ${i} for chromosome ${j}"
     cat "${i}"/*chr"${j}"[a-z]*.dose* >> "${out_dir}"/"${project}"_chr"${j}".dose
-
-    # sense check only 1 file found, decide how to handle more later
-    if [ $(echo "$files" | wc -w) >  1 ]
-    then
-		printf "Found more than one .dose file for chromosome ${j} in ${consent_groups[0]}\n"
-		printf "${chr_info_file}"
-		printf "Should probably do something about this as there should be one"
-    fi
-
-    # define file to add contents to
-    combined_dose_file="${out_dir}/${project}_chr${j}.dose"
-
-    cat $chr_dose_file >> $combined_dose_file
   done
 done
 echo "Completed Concatenating ${project} Consent Groups"
+
+
+
+#for i in "${consent_groups[@]}"; do
+#  for ((j=1; j<=22; j++)); do
+    # for all consent groups find each chromosome .dose file and
+    # add all consent groups chromsome file contents to a single .dose file
+#    echo "Concatenating ${project} consent group ${i} for chromosome ${j}"
+#    chr_dose_file=$(find -E "${i}" -iregex ".*chr${j}.dose(\.)?[a-z0-9]*$")
+
+    # sense check only 1 file found, decide how to handle more later
+    #if [ $(echo "$files" | wc -w) >  1 ]
+    #then
+		#printf "Found more than one .dose file for chromosome ${j} in ${consent_groups[0]}\n"
+		#printf "${chr_info_file}"
+		#printf "Should probably do something about this as there should be one"
+    #fi
+
+    # define file to add contents to
+#    combined_dose_file="${out_dir}/${project}_chr${j}.dose"
+
+#    cat $chr_dose_file >> $combined_dose_file
+#  done
+#done
+#echo "Completed Concatenating ${project} Consent Groups"
 
 
 # As all info files in the study should be identical, copy info files
