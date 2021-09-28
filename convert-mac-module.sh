@@ -110,8 +110,7 @@ for i in "${consent_groups[@]}"; do
     # for all consent groups find each chromosome .dose file and
     # add all consent groups chromsome file contents to a single .dose file
     echo "Concatenating ${project} consent group ${i} for chromosome ${j}"
-
-    chr_dose_file=$(find "${i}" -regextype posix-extended  -iregex ".*chr${j}.dose(\.)?[a-z0-9]*$")
+    cat "${i}"/*chr"${j}"[a-z]*.dose* >> "${out_dir}"/"${project}"_chr"${j}".dose
 
     # sense check only 1 file found, decide how to handle more later
     if [ $(echo "$files" | wc -w) >  1 ]
