@@ -3,9 +3,8 @@
 # manual input
 # Path of the *allchr.pdat input files - (should be the dir used in ${dose2plinkout}"/"${dataset}" from convert-mac-module.sh)
 
-dataset_1_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/WHIMS_dataset/dose2plinkout
-dataset_2_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/GARNET_dataset/dose2plinkout
-# create an array of the datasets
+dataset_1_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/WHIMS_dataset/WHIMS_d2p
+dataset_2_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/GARNET_dataset/GARNET_d2p
 datasets=()
 datasets=(${dataset_1_dir} ${dataset_2_dir})
 
