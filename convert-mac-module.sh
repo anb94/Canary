@@ -92,7 +92,7 @@ then
 fi
 
 d2p="${out_dir}"/"${dataset}"_d2p
-mkdir -p "${out_dir}"/"${dataset}"_d2p
+mkdir -p "${d2p}"
 printf "\nUsing output directory: $d2p"
 
 
@@ -178,13 +178,11 @@ done
 ## Step 2: Identify low quality Quality SNPs ##
 
 for ((i=1; i<=22; i++)); do
-  echo "Generating low quality SNPs"
-  echo "Doing Chromosome number ${i}"
+  echo "Generating low quality SNPs for "${dataset}" Chromosome number ${i}"
 
   gawk '{if ($7 < 0.3) print $1}' "${out_dir}"/"${dataset}"_chr"${i}".info > "${out_dir}"/"${dataset}"_chr"${i}"_lq03_snps.txt
   gawk '{if ($7 < 0.8) print $1}' "${out_dir}"/"${dataset}"_chr"${i}".info > "${out_dir}"/"${dataset}"_chr"${i}"_lq08_snps.txt
 done
-
 echo "Completed Generating low quality SNPs"
 
 
@@ -192,17 +190,18 @@ echo "Completed Generating low quality SNPs"
 
 # Append the low qual 0.3 snp files to a combined file
 for ((i=1; i<=22; i++)); do
-  echo "Doing lq03 ${i}"
+  echo "Collecting low quality (cut-off 0.03) for "${dataset}" chrosome ${i}"
   cat "${out_dir}"/"${dataset}"_chr"${i}"_lq03_snps.txt >> "${out_dir}"/"${dataset}"_all_chr_lq03_snps.txt
 done
 
 # Append the low qual 0.8 snp files to a combined file
 for ((i=1; i<=22; i++)); do
-  echo "Doing lq08 ${i}"
+  echo "Collecting low quality (cut-off 0.08) for "${dataset}" chrosome ${i}"
   cat "${out_dir}"/"${dataset}"_chr"${i}"_lq08_snps.txt >> "${out_dir}"/"${dataset}"_all_chr_lq08_snps.txt
 done
+echo "Completed collecting low quality SNPs"
 
-
+echo "Combining low quality SNPs of all thresholds"
 cat "${out_dir}"/"${dataset}"_all_chr_lq03_snps.txt > "${out_dir}"/"${dataset}"_all_chr_lq_all_snps.txt
 cat "${out_dir}"/"${dataset}"_all_chr_lq08_snps.txt >> "${out_dir}"/"${dataset}"_all_chr_lq_all_snps.txt
 
@@ -217,7 +216,7 @@ cat "${out_dir}"/"${dataset}"_all_chr_lq08_snps.txt >> "${out_dir}"/"${dataset}"
 # e.g. Chromosome '2' info has '1765129' rows and dose has '1765130' columns  columns is 1 more than rows
 
 for ((i=1; i<=22; i++)); do
-  echo "Doing Chromosome ${i}"
+  echo "Generating QC for dose and info file length....Doing Chromosome ${i}"
   info=$(gawk 'END{print NR}' "${out_dir}"/"${dataset}"_chr"${i}".info)
   dose=$(gawk 'END{print NF}' "${out_dir}"/"${dataset}"_chr"${i}".dose)
   echo "Chromosome '${i}' info has '${info}' rows and dose has '${dose}' columns"  >> "${out_dir}"/"${dataset}"_qc-checklength.log
