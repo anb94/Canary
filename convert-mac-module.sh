@@ -10,7 +10,7 @@ Help()
     This script combines MaCH and minimac imputed data for consent groups from the same study.\n\n"
     printf "Usage:\n\n"
     echo "-c    Directories containing consent data, pass once per directory."
-    echo "-n    Project output naming prefix, for naming things."
+    echo "-n    dataset output naming prefix, for naming things."
     echo "-o    Output directory, for outputting data."
     echo "-h    Print this help."
     echo ""
@@ -24,7 +24,7 @@ do
             consent_groups+=("$OPTARG")
             ;;
         n)
-            project="$OPTARG"
+            dataset="$OPTARG"
             ;;
         o)
             out_dir="$OPTARG"
@@ -49,7 +49,7 @@ then
 fi
 
 # check all args given
-for arg in "$consent_groups" "$project" "$out_dir"
+for arg in "$consent_groups" "$dataset" "$out_dir"
 do
     if [ -n "${!arg}" ]
     then
@@ -79,8 +79,9 @@ do
     printf "\t $dir"
 done
 
-printf "\n\nName prefix: $project"
-printf "\nOutput directory: $out_dir"
+printf "\n\nName prefix: $dataset\n"
+
+printf "\nOutput directory: $out_dir\n"
 
 
 # create directory if doesn't already exist
@@ -90,9 +91,9 @@ then
 	$out_dir="${outidr%?}"
 fi
 
-dose2plinkout="${out_dir}/${project}_dose2plinkout"
-mkdir -p dose2plinkout
-printf "Using output directory: $dose2plinkout"
+d2p="${out_dir}"/"${dataset}"_d2p
+mkdir -p "${out_dir}"/"${dataset}"_d2p
+printf "\nUsing output directory: $d2p"
 
 
 # Prepare genotype data #
@@ -110,11 +111,11 @@ printf "Using output directory: $dose2plinkout"
 # Concatenate consent groups
 for i in "${consent_groups[@]}"; do
   for ((j=1; j<=22; j++)); do
-    echo "Concatenating ${project} consent group ${i} for chromosome ${j}"
-    cat "${i}"/*chr"${j}"[a-z]*.dose* >> "${out_dir}"/"${project}"_chr"${j}".dose
+    echo "Concatenating ${dataset} consent group ${i} for chromosome ${j}"
+    cat "${i}"/*chr"${j}"[a-z]*.dose* >> "${out_dir}"/"${dataset}"_chr"${j}".dose
   done
 done
-echo "Completed Concatenating ${project} Consent Groups"
+echo "Completed Concatenating ${dataset} Consent Groups"
 
 
 
@@ -122,7 +123,7 @@ echo "Completed Concatenating ${project} Consent Groups"
 #  for ((j=1; j<=22; j++)); do
     # for all consent groups find each chromosome .dose file and
     # add all consent groups chromsome file contents to a single .dose file
-#    echo "Concatenating ${project} consent group ${i} for chromosome ${j}"
+#    echo "Concatenating ${dataset} consent group ${i} for chromosome ${j}"
 #    chr_dose_file=$(find -E "${i}" -iregex ".*chr${j}.dose(\.)?[a-z0-9]*$")
 
     # sense check only 1 file found, decide how to handle more later
@@ -134,12 +135,12 @@ echo "Completed Concatenating ${project} Consent Groups"
     #fi
 
     # define file to add contents to
-#    combined_dose_file="${out_dir}/${project}_chr${j}.dose"
+#    combined_dose_file="${out_dir}/${dataset}_chr${j}.dose"
 
 #    cat $chr_dose_file >> $combined_dose_file
 #  done
 #done
-#echo "Completed Concatenating ${project} Consent Groups"
+#echo "Completed Concatenating ${dataset} Consent Groups"
 
 
 # As all info files in the study should be identical, copy info files
@@ -148,13 +149,13 @@ echo "Completed Concatenating ${project} Consent Groups"
 
 # As all info files in the study should be identical, copy info files from only one consent group
 for ((i=1; i<=22; i++)); do
-  echo "Copying ${project} info file for for chromosome ${i}"
-  cp "${consent_groups[0]}"/*chr"${i}"[a-z]*.info* "${out_dir}"/"${project}"_chr"${i}".info
+  echo "Copying ${dataset} info file for for chromosome ${i}"
+  cp "${consent_groups[0]}"/*chr"${i}"[a-z]*.info* "${out_dir}"/"${dataset}"_chr"${i}".info
 done
 
 
 #for ((i=1; i<=22; i++)); do
-#  echo "Copying ${project} info file for for chromosome ${i}"
+#  echo "Copying ${dataset} info file for for chromosome ${i}"
 #
 #    # find file for given chromosome in consent group dir
 #    chr_info_file=$(find -E "${consent_groups[0]}" -iregex ".*chr${i}.info$")
@@ -167,8 +168,8 @@ done
 #		printf "Should probably do something about this as there should be one"
 #    fi
 
-    # set destination dir to be specified out dir and name by project and chromosome
-#    destination="${out_dir}/${project}_chr${i}.info"
+    # set destination dir to be specified out dir and name by dataset and chromosome
+#    destination="${out_dir}/${dataset}_chr${i}.info"
 
 #    cp "$chr_info_file" "$destination"
 #done
@@ -180,8 +181,8 @@ for ((i=1; i<=22; i++)); do
   echo "Generating low quality SNPs"
   echo "Doing Chromosome number ${i}"
 
-  gawk '{if ($7 < 0.3) print $1}' "${out_dir}"/"${project}"_chr"${i}".info > "${out_dir}"/"${project}"_chr"${i}"_lq03_snps.txt
-  gawk '{if ($7 < 0.8) print $1}' "${out_dir}"/"${project}"_chr"${i}".info > "${out_dir}"/"${project}"_chr"${i}"_lq08_snps.txt
+  gawk '{if ($7 < 0.3) print $1}' "${out_dir}"/"${dataset}"_chr"${i}".info > "${out_dir}"/"${dataset}"_chr"${i}"_lq03_snps.txt
+  gawk '{if ($7 < 0.8) print $1}' "${out_dir}"/"${dataset}"_chr"${i}".info > "${out_dir}"/"${dataset}"_chr"${i}"_lq08_snps.txt
 done
 
 echo "Completed Generating low quality SNPs"
@@ -192,18 +193,18 @@ echo "Completed Generating low quality SNPs"
 # Append the low qual 0.3 snp files to a combined file
 for ((i=1; i<=22; i++)); do
   echo "Doing lq03 ${i}"
-  cat "${out_dir}"/"${project}"_chr"${i}"_lq03_snps.txt >> "${out_dir}"/"${project}"_all_chr_lq03_snps.txt
+  cat "${out_dir}"/"${dataset}"_chr"${i}"_lq03_snps.txt >> "${out_dir}"/"${dataset}"_all_chr_lq03_snps.txt
 done
 
 # Append the low qual 0.8 snp files to a combined file
 for ((i=1; i<=22; i++)); do
   echo "Doing lq08 ${i}"
-  cat "${out_dir}"/"${project}"_chr"${i}"_lq08_snps.txt >> "${out_dir}"/"${project}"_all_chr_lq08_snps.txt
+  cat "${out_dir}"/"${dataset}"_chr"${i}"_lq08_snps.txt >> "${out_dir}"/"${dataset}"_all_chr_lq08_snps.txt
 done
 
 
-cat "${out_dir}"/"${project}"_all_chr_lq03_snps.txt > "${out_dir}"/"${project}"_all_chr_lq_all_snps.txt
-cat "${out_dir}"/"${project}"_all_chr_lq08_snps.txt >> "${out_dir}"/"${project}"_all_chr_lq_all_snps.txt
+cat "${out_dir}"/"${dataset}"_all_chr_lq03_snps.txt > "${out_dir}"/"${dataset}"_all_chr_lq_all_snps.txt
+cat "${out_dir}"/"${dataset}"_all_chr_lq08_snps.txt >> "${out_dir}"/"${dataset}"_all_chr_lq_all_snps.txt
 
 
 ## Step 3: Check input file dimensions Quality control ##
@@ -217,9 +218,9 @@ cat "${out_dir}"/"${project}"_all_chr_lq08_snps.txt >> "${out_dir}"/"${project}"
 
 for ((i=1; i<=22; i++)); do
   echo "Doing Chromosome ${i}"
-  info=$(gawk 'END{print NR}' "${out_dir}"/"${project}"_chr"${i}".info)
-  dose=$(gawk 'END{print NF}' "${out_dir}"/"${project}"_chr"${i}".dose)
-  echo "Chromosome '${i}' info has '${info}' rows and dose has '${dose}' columns"  >> "${out_dir}"/"${project}"_qc-checklength.log
+  info=$(gawk 'END{print NR}' "${out_dir}"/"${dataset}"_chr"${i}".info)
+  dose=$(gawk 'END{print NF}' "${out_dir}"/"${dataset}"_chr"${i}".dose)
+  echo "Chromosome '${i}' info has '${info}' rows and dose has '${dose}' columns"  >> "${out_dir}"/"${dataset}"_qc-checklength.log
 done
 
 
@@ -230,7 +231,7 @@ done
 
 for ((i=1; i<=22; i++)); do
     echo "Converting .info and .dose for Chromosome ${i}"
-    dose2plink -m 15000 --dose "${out_dir}"/"${project}"_chr"${i}".dose --info "${out_dir}"/"${project}"_chr"${i}".info -gz 0 --out "${dose2plinkout}"/"${project}"_chr"${i}"
+    dose2plink -m 15000 --dose "${out_dir}"/"${dataset}"_chr"${i}".dose --info "${out_dir}"/"${dataset}"_chr"${i}".info -gz 0 --out "${d2p}"/"${dataset}"_chr"${i}"
 done
 
 echo "Completed dose2plink conversion"
@@ -240,8 +241,8 @@ echo "Completed dose2plink conversion"
 
 # The pdat files for each chromosome need to be combined into a single file.
 # Add the first file into a new pdat file and then append the rest of the fiels without the header
-cat "${dose2plinkout}"/"${project}"_chr1.pdat > "${dose2plinkout}"/"${project}"_allchr.pdat
+cat "${d2p}"/"${dataset}"_chr1.pdat > "${d2p}"/"${dataset}"_allchr.pdat
 for ((i=2; i<=22; i++)); do
-    echo "Doing "${project}"_chr${i}"
-    cat "${dose2plinkout}"/"${project}"_chr"${i}".pdat | tail -n +2 >> "${dose2plinkout}"/"${project}"_allchr.pdat
+    echo "Doing "${dataset}"_chr${i}"
+    cat "${d2p}"/"${dataset}"_chr"${i}".pdat | tail -n +2 >> "${d2p}"/"${dataset}"_allchr.pdat
 done
