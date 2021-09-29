@@ -43,7 +43,7 @@ done
 echo "Completed Generating SNP sets"
 
 echo "Generating file of shared snps between the datasets"
-source "${BASH_SOURCE%/*}/multicomm"  "${out_dir}"/*_snp-set.tsv > "${out_dir}"/"${output_name}"_sharedsnps.tsv
+source "${BASH_SOURCE%/*}/multi_comm.sh"  "${out_dir}"/*_snp-set.tsv > "${out_dir}"/"${output_name}"_sharedsnps.tsv
 #echo "$(comm -12 "${out_dir}"/*_snp-set.tsv > "${out_dir}"/"${output_name}"_sharedsnps.tsv
 #echo "Done generating file of shared snps"
 #echo "$(cut -d ' ' -f 1 "${out_dir}"/"${output_name}"_sharedsnps.tsv)" > "${out_dir}"/"${output_name}"_shared_alleles.tsv
