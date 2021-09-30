@@ -240,8 +240,12 @@ echo "Completed dose2plink conversion"
 
 # The pdat files for each chromosome need to be combined into a single file.
 # Add the first file into a new pdat file and then append the rest of the fiels without the header
-cat "${d2p}"/"${dataset}"_chr1.pdat > "${d2p}"/"${dataset}"_allchr.pdat
+cat "${d2p}"/"${dataset}"_chr1.pdat > "${out_dir}"/"${dataset}"_allchr.pdat
 for ((i=2; i<=22; i++)); do
     echo "Doing "${dataset}"_chr${i}"
-    cat "${d2p}"/"${dataset}"_chr"${i}".pdat | tail -n +2 >> "${d2p}"/"${dataset}"_allchr.pdat
+    cat "${d2p}"/"${dataset}"_chr"${i}".pdat | tail -n +2 >> "${out_dir}"/"${dataset}"_allchr.pdat
 done
+
+cp "${d2p}"/"${dataset}"_chr1.pfam "${out_dir}"/"${dataset}"_allchr.pfam
+
+# NOTE: The completed files are stored in the outdir not d2p subfolder for convenience in later steps. Also, the individual files in d2p subfolder are no longer needed and can be deleted.
