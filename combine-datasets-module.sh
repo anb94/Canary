@@ -46,7 +46,7 @@ echo "Completed Generating SNP sets"
 
 echo "Generating file of shared snps between the datasets"
 # Use the script multi_comm to compare all input files for common SNPs
-"${BASH_SOURCE%/*}/multi_comm.sh"  "${out_dir}"/*_snp-set.tsv > "${out_dir}"/"${output_name}"_sharedsnps.tsv
+source "${BASH_SOURCE%/*}/multi_comm.sh"  "${out_dir}"/*_snp-set.tsv > "${out_dir}"/"${output_name}"_sharedsnps.tsv
 
 # NOTE: if any errors occur in this step, they are also likely to occur in the step below as the code is very similar #
 
@@ -71,7 +71,7 @@ echo "Completed Generating SNP sets"
 
 echo "Generating file of shared snps between the datasets"
 # Use the script multi_comm to compare all input files for common SNPs
-"${BASH_SOURCE%/*}/multi_comm.sh" "${out_dir}"/*_tempmap1.tsv > "${out_dir}"/"${output_name}"__tempmap2.tsv
+source "${BASH_SOURCE%/*}/multi_comm.sh" "${out_dir}"/*_tempmap1.tsv > "${out_dir}"/"${output_name}"__tempmap2.tsv
 
 # map file must contain a header since header was removed in the above for loop - take header from the first pdat file in array.
 gawk '{print 0,$1,0,0}' "${datasets[0]}"/*_allchr.pdat | head -n 1 > "${out_dir}"/"${output_name}".map
@@ -96,7 +96,7 @@ for i in "${datasets[@]}"; do
   dtst=$(basename "$i")
   plink2 --import-dosage "${i}"/*_allchr.pdat \
   --psam "${i}"/*_allchr.pfam \
-  --include "${i}"/"$dtst}"_sharedsnps.tsv \
+  --extract "${i}"/"$dtst}"_sharedsnps.tsv \
   --exclude "${i}"/"${dtst}"_lq_all_snps.txt \
   --make-pgen \
   --out "${i}"/"${dtst}"_plink_temp1

@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 function recursive_comm {
     if [ "$#" -eq 2 ]; then
