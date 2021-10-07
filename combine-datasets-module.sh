@@ -40,13 +40,15 @@ for i in "${datasets[@]}"; do
   dtst=$(basename "$i")
   # remove the first line as it contains header
   tail -n +2  "${i}"/*_allchr.pdat | gawk '{print $1,$2,$3}' | sort > "${out_dir}"/"${dtst}"_snp-set.tsv
+  tail -n +2  "${i}"/*_allchr.pdat | gawk '{print $1,$2,$3}' | sort > "${i}"/"${dtst}"_snp-set.tsv
+
   echo "Finished generating SNP set for "${i}""
 done
 echo "Completed Generating SNP sets"
 
 echo "Generating file of shared snps between the datasets"
 # Use the script multi_comm to compare all input files for common SNPs
-source "${BASH_SOURCE%/*}/multi_comm.sh"  "${out_dir}"/*_snp-set.tsv > "${out_dir}"/"${output_name}"_sharedsnps.tsv
+./multi_comm.sh  "${out_dir}"/*_snp-set.tsv > "${out_dir}"/"${output_name}"_sharedsnps.tsv
 
 # NOTE: if any errors occur in this step, they are also likely to occur in the step below as the code is very similar #
 
@@ -60,22 +62,27 @@ source "${BASH_SOURCE%/*}/multi_comm.sh"  "${out_dir}"/*_snp-set.tsv > "${out_di
 # Generate map file for the combined dataset #
 # The below code generating the map files is based on the code above
 for i in "${datasets[@]}"; do
-  echo "Generating map file for "${i}""
+  echo "Generating map file for "${dtst}" in directory "${i}""
   #take name of folder as the name for each individual dataset
   dtst=$(basename "$i")
   # remove the first line as it contains header
-  tail -n +2 "${i}"/*_allchr.pdat | sort > "${out_dir}"/"${dtst}"_tempmap1.tsv
-  echo "Finished generating map file for "${i}""
+  tail -n +2  "${i}"/*_allchr.pdat | gawk '{print 0,$1,$0, $0}' > "${i}"/"${dtst}".map
+  echo "Finished generating map file for "${dtst}""
 done
-echo "Completed Generating SNP sets"
+echo "Completed Generating map files for datasets"
 
-echo "Generating file of shared snps between the datasets"
-# Use the script multi_comm to compare all input files for common SNPs
 source "${BASH_SOURCE%/*}/multi_comm.sh" "${out_dir}"/*_tempmap1.tsv > "${out_dir}"/"${output_name}"__tempmap2.tsv
 
+
+#  tail -n +2  "${i}"/*_allchr.pdat | gawk '{print 0,$1,$0}' > "${out_dir}"/"${dtst}"_tempmap1.tsv
+#tail -n +2 "${i}"/*_allchr.pdat > "${out_dir}"/"${dtst}"_temp_allchr.pdat
+#sort --buffer-size=64 "${out_dir}"/"${dtst}"_temp_allchr.pdat -o "${out_dir}"/"${dtst}"_tempmap1.tsv
+# Use the script multi_comm to compare all input files for common SNPs
 # map file must contain a header since header was removed in the above for loop - take header from the first pdat file in array.
-gawk '{print 0,$1,0,0}' "${datasets[0]}"/*_allchr.pdat | head -n 1 > "${out_dir}"/"${output_name}".map
-gawk '{print 0,$1,0,0}' "${out_dir}"/"${output_name}"__tempmap2.tsv >> "${out_dir}"/"${output_name}".map
+#gawk '{print 0,$1,0,0}' "${datasets[0]}"/*_allchr.pdat | head -n 1 > "${out_dir}"/"${output_name}".map
+#gawk '{print 0,$1,0,0}' "${out_dir}"/"${output_name}"__tempmap2.tsv >> "${out_dir}"/"${output_name}".map
+# ########################### ########################### ########################### ########################### ##########################
+
 
 
 # Collect low quality SNPs
@@ -96,6 +103,7 @@ for i in "${datasets[@]}"; do
   dtst=$(basename "$i")
   plink2 --import-dosage "${i}"/*_allchr.pdat \
   --psam "${i}"/*_allchr.pfam \
+  --map "${i}"/"${dtst}".map \
   --extract "${i}"/"$dtst}"_sharedsnps.tsv \
   --exclude "${i}"/"${dtst}"_lq_all_snps.txt \
   --make-pgen \
