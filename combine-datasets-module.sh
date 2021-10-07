@@ -30,7 +30,7 @@ out_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/test_combine
 
 
 ########################################################################
-
+cd ~/github/SAP2-GWAS
 
 
 # Generate the set of SNPs in each dataset #
@@ -71,7 +71,7 @@ for i in "${datasets[@]}"; do
 done
 echo "Completed Generating map files for datasets"
 
-source "${BASH_SOURCE%/*}/multi_comm.sh" "${out_dir}"/*_tempmap1.tsv > "${out_dir}"/"${output_name}"__tempmap2.tsv
+./multi_comm.sh "${out_dir}"/*_tempmap1.tsv > "${out_dir}"/"${output_name}"__tempmap2.tsv
 
 
 #  tail -n +2  "${i}"/*_allchr.pdat | gawk '{print 0,$1,$0}' > "${out_dir}"/"${dtst}"_tempmap1.tsv
