@@ -228,6 +228,7 @@ done
 
 # Use the dose2plink to convert .dose and .info to .pdat and .pfam:
 
+
 for ((i=1; i<=22; i++)); do
     echo "Converting .info and .dose for Chromosome ${i}"
     dose2plink -m 15000 --dose "${out_dir}"/"${dataset}"_chr"${i}".dose --info "${out_dir}"/"${dataset}"_chr"${i}".info -gz 0 --out "${d2p}"/"${dataset}"_chr"${i}"
