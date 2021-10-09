@@ -13,7 +13,7 @@ output_name=whi_test
 
 # output directory for the combined datasets
 out_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/test_combine
-
+script_dir=/home/anbennett2/github/SAP2-GWAS
 
 
 ########################################################################
@@ -30,7 +30,7 @@ out_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/test_combine
 
 
 ########################################################################
-cd ~/github/SAP2-GWAS
+
 
 
 # Generate the set of SNPs in each dataset #
@@ -48,7 +48,7 @@ echo "Completed Generating SNP sets"
 
 echo "Generating file of shared snps between the datasets"
 # Use the script multi_comm to compare all input files for common SNPs
-./multi_comm.sh  "${out_dir}"/*_snp-set.tsv > "${out_dir}"/"${output_name}"_sharedsnps.tsv
+"${script_dir}"/multi_comm.sh  "${out_dir}"/*_snp-set.tsv > "${out_dir}"/"${output_name}"_sharedsnps.tsv
 
 # NOTE: if any errors occur in this step, they are also likely to occur in the step below as the code is very similar #
 
@@ -71,7 +71,7 @@ for i in "${datasets[@]}"; do
 done
 echo "Completed Generating map files for datasets"
 
-./multi_comm.sh "${out_dir}"/*_tempmap1.tsv > "${out_dir}"/"${output_name}"__tempmap2.tsv
+"${script_dir}"/multi_comm.sh "${out_dir}"/*_tempmap1.tsv > "${out_dir}"/"${output_name}"__tempmap2.tsv
 
 
 #  tail -n +2  "${i}"/*_allchr.pdat | gawk '{print 0,$1,$0}' > "${out_dir}"/"${dtst}"_tempmap1.tsv
