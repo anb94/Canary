@@ -104,7 +104,7 @@ for i in "${datasets[@]}"; do
   plink2 --import-dosage "${i}"/*_allchr.pdat \
   --psam "${i}"/*_allchr.pfam \
   --map "${i}"/"${dtst}".map \
-  --extract "${i}"/"$dtst}"_sharedsnps.tsv \
+  --extract "${i}"/"${dtst}"_sharedsnps.tsv \
   --exclude "${i}"/"${dtst}"_lq_all_snps.txt \
   --make-pgen \
   --out "${i}"/"${dtst}"_plink_temp1
