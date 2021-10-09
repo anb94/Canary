@@ -66,7 +66,7 @@ for i in "${datasets[@]}"; do
   #take name of folder as the name for each individual dataset
   dtst=$(basename "$i")
   # remove the first line as it contains header
-  tail -n +2  "${i}"/*_allchr.pdat | gawk '{print 0,$1,$0, $0}' > "${i}"/"${dtst}".map
+  tail -n +2  "${i}"/*_allchr.pdat | gawk '{print 0,$1,0,0}' > "${i}"/"${dtst}".map
   echo "Finished generating map file for "${dtst}""
 done
 echo "Completed Generating map files for datasets"
@@ -110,9 +110,10 @@ for i in "${datasets[@]}"; do
   --out "${i}"/"${dtst}"_plink_temp1
 done
 
+rm "${out_dir}"/"${output_name}"_plink.txt
 for i in "${datasets[@]}"; do
   echo "${i}"/"${dtst}"_plink_temp1 >> "${out_dir}"/"${output_name}"_plink.txt
 done
 
 
-plink2 --pmerge-list "${out_dir}"/"${output_name}"_plink.txt --make-pgen --out "${out_dir}"/"${output_name}"_temp2
+#plink2 --pmerge-list "${out_dir}"/"${output_name}"_plink.txt --make-pgen --out "${out_dir}"/"${output_name}"_temp2
