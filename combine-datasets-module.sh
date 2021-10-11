@@ -106,12 +106,12 @@ for i in "${datasets[@]}"; do
   --psam "${i}"/*_allchr.pfam \
   --map "${i}"/"${dtst}".map \
   --extract "${out_dir}"/"${output_name}"_sharedsnps.tsv \
-  --exclude "${i}"/"${dtst}"_lq_all_snps.txt \
+  --exclude "${i}"/*_lq_all_snps.txt \
   --make-pgen \
   --out "${i}"/"${dtst}"_plink_temp1
 done
 
-rm "${out_dir}"/"${output_name}"_plink.txt
+rm -rf "${out_dir}"/"${output_name}"_plink.txt
 for i in "${datasets[@]}"; do
   echo "${i}"/"${dtst}"_plink_temp1 >> "${out_dir}"/"${output_name}"_plink.txt
 done
