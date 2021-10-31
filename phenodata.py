@@ -275,6 +275,8 @@ my_pheno_file_WHIMS = my_pheno_file_WHIMS.rename(columns={"dbGaP_Sample_ID": "FI
 
 pheno_out_dir = "/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/phenotype_data"
 
+/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/GARNET_dataset
+
 
 SHARE_covar = my_pheno_file_SHARE[["FIID", "FIID", "AGE", "HISTORY_DIABETES", "PANCREATITIS", "MEAN_BMI", "MEAN_WHR"]].copy()
 
@@ -304,6 +306,6 @@ WHIMS_covar.to_csv(os.path.join(pheno_out_dir, "WHIMS_covar.tsv"), sep='\t', ind
 
 
 
-SHARE_phenogeno.to_csv(os.path.join(pheno_out_dir, "SHARE_phenogeno.tsv"), sep='\t', index=False)
-GARNET_phenogeno.to_csv(os.path.join(pheno_out_dir, "GARNET_phenogeno.tsv"), sep='\t', index=False)
-WHIMS_phenogeno.to_csv(os.path.join(pheno_out_dir, "WHIMS_phenogeno.tsv"), sep='\t', index=False)
+SHARE_phenogeno.to_csv(os.path.join(pheno_out_dir, "SHARE_dataset_phenogeno.tsv"), sep='\t', index=False)
+GARNET_phenogeno.to_csv(os.path.join(pheno_out_dir, "GARNET_dataset_phenogeno.tsv"), sep='\t', index=False)
+WHIMS_phenogeno.to_csv(os.path.join(pheno_out_dir, "WHIMS_dataset_phenogeno.tsv"), sep='\t', index=False)
