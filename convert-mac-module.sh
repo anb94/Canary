@@ -248,5 +248,7 @@ for ((i=2; i<=22; i++)); do
 done
 
 cp "${d2p}"/"${dataset}"_chr1.pfam "${out_dir}"/"${dataset}"_allchr.pfam
+cp "${d2p}"/"${dataset}"_chr1.pfam "${out_dir}"/"${dataset}"_allchr.tsv
+
 
 # NOTE: The completed files are stored in the outdir not d2p subfolder for convenience in later steps. Also, the individual files in d2p subfolder are no longer needed and can be deleted.

@@ -112,15 +112,15 @@ for i in "${datasets[@]}"; do
   #take name of folder as the name for each individual dataset
   dtst=$(basename "$i")
   plink2 --import-dosage "${i}"/*_allchr.pdat \
-  --psam "${i}"/*_allchr.pfam \
+  --psam "${i}"/"${dtst}"_allchr.pfam \
   --map "${i}"/"${dtst}".map \
   --extract "${out_dir}"/"${output_name}"_sharedsnps.tsv \
   --exclude "${i}"/*_lq_all_snps.txt \
-  --pheno *_phenogeno.tsv \
-  --covar "${i}"/*covar* \
+  --pheno "${i}"/"${dtst}"_pheno.tsv \
+  --covar "${i}"/"${dtst}"_covar.tsv \
   --make-pgen \
   --out "${i}"/"${dtst}"_plink2_temp1
-echo "converting "${i}" into plink1 format"
+#echo "converting "${i}" into plink1 format"
   plink2 --pfile "${i}"/"${dtst}"_plink2_temp1 \
   --make-bed \
   --out "${i}"/"${dtst}"_plink1_temp1
@@ -128,20 +128,18 @@ done
 
 
 
-
-
-
-
-
 rm -rf "${out_dir}"/"${output_name}"_plink.txt
 for i in "${datasets[@]}"; do
-  echo "${i}"/"${dtst}"_plink_temp1 >> "${out_dir}"/"${output_name}"_plink.txt
+  dtst=$(basename "$i")
+  echo "${i}"/"${dtst}"_plink1_temp1 >> "${out_dir}"/"${output_name}"_plink.txt
 done
 
-plink2 --pmerge-list "${out_dir}"/"${output_name}"_plink.txt --make-pgen --out "${out_dir}"/"${output_name}"_temp2
 
 
+plink --merge-list "${out_dir}"/"${output_name}"_plink.txt --make-bed --out "${out_dir}"/"${output_name}"_temp2
 
+
+#plink2 --pmerge "${dataset_1_dir}"/WHIMS_dataset_plink2_temp1 "${dataset_2_dir}"/GARNET_dataset_plink2_temp1 --make-pgen --out "${out_dir}"/"${output_name}"_temp2
 
 
 ## Step 3.2: Correct pfiles ##
@@ -154,24 +152,24 @@ echo "Generating files for "${output_name}" "
 
 # Print the 3rd column called ID from the pvar file and split it based on ':' then take the first and second element. Take off the header and add a new header and add to new file
 echo "Taking ID and splitting into chromosome and position for later use..."
-gawk 'BEGIN{FS="\t"; OFS="\t"}{print $3}' "${dataset_dir}"/"${output_name}"_temp.pvar | gawk 'BEGIN{FS=":";OFS="\t"}{print $1,$2}' | tail -n+2 | sed '1i #CHROM POS' > "${dataset_dir}"/"${output_name}"_temp_chrpos.pvar
+gawk 'BEGIN{FS="\t"; OFS="\t"}{print $3}' "${dataset_dir}"/"${output_name}"_temp2.pvar | gawk 'BEGIN{FS=":";OFS="\t"}{print $1,$2}' | tail -n+2 | sed '1i #CHROM POS' > "${dataset_dir}"/"${output_name}"_temp2_chrpos.pvar
 
 
 # Paste the original pvar and the new intermediate file into another intermediate file
 echo "Making temporary file..."
-paste "${dataset_dir}"/"${output_name}"_temp.pvar "${dataset_dir}"/"${output_name}"_temp_chrpos.pvar > "${dataset_dir}"/"${output_name}"_temp_w_chrpos.pvar
+paste "${dataset_dir}"/"${output_name}"_temp2.pvar "${dataset_dir}"/"${output_name}"_temp2_chrpos.pvar > "${dataset_dir}"/"${output_name}"_temp2_w_chrpos.pvar
 
 
 
 # Make a new pvar file with the corrected columns
 
 echo "Make new pvar file with correct chromosome and position information..."
-gawk 'BEGIN{FS="\t";OFS="\t"}{print $6,$7,$3,$4,$5}' "${dataset_dir}"/"${output_name}"_temp_w_chrpos.pvar > "${dataset_dir}"/"${output_name}"_temp_updated.pvar
+gawk 'BEGIN{FS="\t";OFS="\t"}{print $6,$7,$3,$4,$5}' "${dataset_dir}"/"${output_name}"_temp2_w_chrpos.pvar > "${dataset_dir}"/"${output_name}"_temp2_updated.pvar
 
 
 # Copy the other pfiles with a matching name so that plink2 knows they are together.
 
 echo "Copying other files in the set for plink compatibility..."
-cp "${dataset_dir}"/"${output_name}"_temp.psam "${dataset_dir}"/"${output_name}"_temp_updated.psam
-cp  "${dataset_dir}"/"${output_name}"_temp.pgen "${dataset_dir}"/"${output_name}"_temp_updated.pgen
+cp "${dataset_dir}"/"${output_name}"_temp2.psam "${dataset_dir}"/"${output_name}"_temp_updated.psam
+cp  "${dataset_dir}"/"${output_name}"_temp2.pgen "${dataset_dir}"/"${output_name}"_temp_updated.pgen
 echo "Done"

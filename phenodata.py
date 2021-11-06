@@ -23,7 +23,6 @@ c2_pheno_data_dir = "/home/anbennett2/scratch/datasets/raw_data/dbgap_data/WHI/p
 # Then, you can simple replace the file name within the quotation marks ("") with the name of the file you wish to use.
 
 
-
 c1_form2 = pd.read_csv(os.path.join(c1_pheno_data_dir, "phs000200.v11.pht000998.v6.p3.c1.f2_rel1.HMB-IRB.txt"), sep="\t", comment="#")
 c2_form2 = pd.read_csv(os.path.join(c2_pheno_data_dir, "phs000200.v11.pht000998.v6.p3.c2.f2_rel1.HMB-IRB-NPU.txt"), sep="\t", comment="#")
 form2 = pd.concat([c1_form2, c2_form2], axis=0,  ignore_index=True)
@@ -60,15 +59,15 @@ outc_cancer_rel4 = pd.concat([c1_outc_cancer_rel4, c2_outc_cancer_rel4], axis=0,
 # These files are not part of the phenotype data that you are interested in per se, but are important for extracting the samples which only are present in the study you are investigating (i.e. the harmonized and imputed data)
 
 
-c1_WHI_Sample = pd.read_csv(os.path.join(c1_pheno_data_dir, "phs000200.v11.pht001032.v8.p3.WHI_Sample.MULTI.txt"), sep="\t", comment="#")
-c2_WHI_Sample = pd.read_csv(os.path.join(c2_pheno_data_dir, "phs000200.v11.pht001032.v8.p3.WHI_Sample.MULTI.txt"), sep="\t", comment="#")
-WHI_Sample = pd.concat([c1_WHI_Sample, c2_WHI_Sample], axis=0,  ignore_index=True)
+WHI_Sample = pd.read_csv(os.path.join(c1_pheno_data_dir, "phs000200.v11.pht001032.v8.p3.WHI_Sample.MULTI.txt"), sep="\t", comment="#")
+#c2_WHI_Sample = pd.read_csv(os.path.join(c2_pheno_data_dir, "phs000200.v11.pht001032.v8.p3.WHI_Sample.MULTI.txt"), sep="\t", comment="#")
+#WHI_Sample = pd.concat([c1_WHI_Sample, c2_WHI_Sample], axis=0,  ignore_index=True)
 
 
 
-c1_WHI_Subject = pd.read_csv(os.path.join(c1_pheno_data_dir, "phs000200.v11.pht000982.v8.p3.WHI_Subject.MULTI.txt"), sep="\t", comment="#")
-c2_WHI_Subject = pd.read_csv(os.path.join(c2_pheno_data_dir, "phs000200.v11.pht000982.v8.p3.WHI_Subject.MULTI.txt"), sep="\t", comment="#")
-WHI_Subject = pd.concat([c1_WHI_Subject, c2_WHI_Subject], axis=0,  ignore_index=True)
+WHI_Subject = pd.read_csv(os.path.join(c1_pheno_data_dir, "phs000200.v11.pht000982.v8.p3.WHI_Subject.MULTI.txt"), sep="\t", comment="#")
+#c2_WHI_Subject = pd.read_csv(os.path.join(c2_pheno_data_dir, "phs000200.v11.pht000982.v8.p3.WHI_Subject.MULTI.txt"), sep="\t", comment="#")
+#WHI_Subject = pd.concat([c1_WHI_Subject, c2_WHI_Subject], axis=0,  ignore_index=True)
 
 
 
@@ -84,6 +83,40 @@ c2_genopheno_data_dir = "/home/anbennett2/scratch/datasets/raw_data/dbgap_data/W
 c1_746_pheno = pd.read_csv(os.path.join(c1_genopheno_data_dir, "phs000746.v2.pht004719.v1.p3.c1.WHI_Imputation_Sample_Attributes.HMB-IRB.txt"), sep="\t", comment="#")
 c2_746_pheno = pd.read_csv(os.path.join(c2_genopheno_data_dir, "phs000746.v2.pht004719.v1.p3.c2.WHI_Imputation_Sample_Attributes.HMB-IRB-NPU.txt"), sep="\t", comment="#")
 phenogeno = pd.concat([c1_746_pheno, c2_746_pheno], axis=0,  ignore_index=True)
+
+
+
+
+
+
+# Loading the samples in the genotype dataset #
+
+# Here we will define the directory that contains the genotype files. This is because we will use the _allchr.tsv file produced in the convert-mac-module.sh script.
+
+GARNET_genodir= "/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/GARNET_dataset"
+WHIMS_genodir= "/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/WHIMS_dataset"
+
+
+
+GARNET_geno_samples = pd.read_csv(os.path.join(GARNET_genodir, "test.tsv"), sep="\t", comment="#", names=["FID", "IID", "In-Fam-ID-Dad", "In-Fam-ID-Mum", "SEX", "Pheno"])
+WHIMS_geno_samples = pd.read_csv(os.path.join(WHIMS_genodir, "WHIMS_allchr.tsv"), sep="\t", comment="#", names=["FID", "IID", "In-Fam-ID-Dad", "In-Fam-ID-Mum", "SEX", "Pheno"])
+
+
+
+
+
+
+
+# N.B. The columns of these files are defined by plink:
+
+#Family ID ('FID')
+#Within-family ID ('IID'; cannot be '0')
+#Within-family ID of father ('0' if father isn't in dataset)
+#Within-family ID of mother ('0' if mother isn't in dataset)
+#Sex code ('1' = male, '2' = female, '0' = unknown)
+#Phenotype value ('1' = control, '2' = case, '-9'/'0'/non-numeric = missing data if case/control)
+
+
 
 
 ##################################################
@@ -103,6 +136,7 @@ outc_cancer_rel4.PANCREAS = outc_cancer_rel4.PANCREAS.fillna(0)
 
 pancan_occ = outc_cancer_rel4[outc_cancer_rel4['PANCREAS'] == 1.0].copy()
 pancan_occ.reset_index(inplace=True,drop=True)
+pancan_occ['case'] = 2
 
 
 
@@ -143,10 +177,8 @@ phenogeno_sample_info_SHARE = phenogeno_sample_info[phenogeno_sample_info.SAMPLE
 phenogeno_sample_info_SHARE.reset_index(inplace=True,drop=True)
 
 
-
 phenogeno_sample_info_WHIMS = phenogeno_sample_info[phenogeno_sample_info.SAMPLE_ORIGIN.str.match('WHIMS')]
 phenogeno_sample_info_WHIMS.reset_index(inplace=True,drop=True)
-
 
 
 phenogeno_sample_info_GARNET = phenogeno_sample_info[phenogeno_sample_info.SAMPLE_ORIGIN.str.match('GARNET')]
@@ -158,11 +190,17 @@ phenogeno_sample_info_all = pd.concat([phenogeno_sample_info_SHARE, phenogeno_sa
 
 # - Merge the above filtered dataframes from the WHI Sample and 746 pheno dataframes. This is done with a left join onto the 746_pheno_info_SHARE dfs, as these should contain only those subjects who participated in SHARE.
 # The subsequent df will be used later on when appending the phenotype information:
+
 SHARE_dataset = pd.merge(left=phenogeno_sample_info_SHARE, right=WHI_sample_filt_746_final, how='left', left_on='dbGaP_Sample_ID', right_on='dbGaP_Sample_ID')
 GARNET_dataset = pd.merge(left=phenogeno_sample_info_GARNET, right=WHI_sample_filt_746_final, how='left', left_on='dbGaP_Sample_ID', right_on='dbGaP_Sample_ID')
 WHIMS_dataset = pd.merge(left=phenogeno_sample_info_WHIMS, right=WHI_sample_filt_746_final, how='left', left_on='dbGaP_Sample_ID', right_on='dbGaP_Sample_ID')
 
 all_dataset = pd.merge(left=phenogeno_sample_info_all, right=WHI_sample_filt_746_final, how='left', left_on='dbGaP_Sample_ID', right_on='dbGaP_Sample_ID')
+
+
+
+
+
 
 # Create a new dataframe which contains the phenotype data relevant to the GWAS. First, an empty df is created and db_GaP_Subject_ID is added using form 2, as it contains basic information about the patients,
 # without which we cannot control for key confounders - hence this information is essential:
@@ -186,7 +224,7 @@ my_pheno_file = pd.merge(left=my_pheno_file, right=form2[['dbGaP_Subject_ID', 'A
 my_pheno_file = pd.merge(left=my_pheno_file, right=form41[['dbGaP_Subject_ID','SPANISH', 'BLACK']], how='left', left_on='dbGaP_Subject_ID', right_on='dbGaP_Subject_ID')
 my_pheno_file = pd.merge(left=my_pheno_file, right=form30[['dbGaP_Subject_ID', 'PANCREAT']], how='left', left_on='dbGaP_Subject_ID', right_on='dbGaP_Subject_ID')
 my_pheno_file = pd.merge(left=my_pheno_file, right=outc_ct_os[['dbGaP_Subject_ID', 'PANCREASDY', 'DEATH','DEATHDY', 'ENDWHIDY', 'ENDFOLLOWDY']], how='left', left_on='dbGaP_Subject_ID', right_on='dbGaP_Subject_ID')
-my_pheno_file = pd.merge(left=my_pheno_file, right=pancan_occ[['dbGaP_Subject_ID', 'PANCREAS', 'ICDCODE', 'BEHAVIOR', 'DIAGSTAT', 'LATERAL', 'MRPHHISTB', 'GRADING', 'SIZE', 'STAGE']], how='left', left_on='dbGaP_Subject_ID', right_on='dbGaP_Subject_ID')
+my_pheno_file = pd.merge(left=my_pheno_file, right=pancan_occ[['dbGaP_Subject_ID', 'PANCREAS', 'ICDCODE', 'BEHAVIOR', 'DIAGSTAT', 'LATERAL', 'MRPHHISTB', 'GRADING', 'SIZE', 'STAGE', 'case']], how='left', left_on='dbGaP_Subject_ID', right_on='dbGaP_Subject_ID')
 my_pheno_file = pd.merge(left=my_pheno_file, right=form80_BMI, how='left', left_on='dbGaP_Subject_ID', right_on='dbGaP_Subject_ID')
 my_pheno_file = pd.merge(left=my_pheno_file, right=form80_WHRX[['dbGaP_Subject_ID', 'WHRX']], how='left', left_on='dbGaP_Subject_ID', right_on='dbGaP_Subject_ID')
 
@@ -218,7 +256,7 @@ my_pheno_file['PAN_CAN_MONTHS_SURVIVED'] = (my_pheno_file.AGE_DEATH - my_pheno_f
 
 ## Convert the number of days till end follow up to their age at end of follow up
 
-my_pheno_file.AGE_END_FOLLOW = my_pheno_file.AGE+(my_pheno_file.AGE_END_FOLLOW / 365)
+my_pheno_file.AGE_END_FOLLOW = my_pheno_file.AGE + (my_pheno_file.AGE_END_FOLLOW / 365)
 
 
 
@@ -226,11 +264,13 @@ my_pheno_file.AGE_END_FOLLOW = my_pheno_file.AGE+(my_pheno_file.AGE_END_FOLLOW /
 
 
 
-###############################################################################################################################################################################
+# In plink, the sex is denoted as: 1=male/2=female/{0,NA}. Therefore, replace the values accordingly:
 
-## Add column denoting sex:
+#my_pheno_file[my_pheno_file['sex'] == 'M'] = 1
+#my_pheno_file[my_pheno_file['sex'] == 'F'] = 2
 
-my_pheno_file['sex'] = 'F'
+#my_pheno_file['sex'].loc[my_pheno_file['sex-temp'] == 'F'] = 2
+
 
 
 ###################################################################################################################################################################################################
@@ -249,17 +289,21 @@ my_pheno_file_WHIMS = pd.merge(left=WHIMS_dataset, right=my_pheno_file, how='lef
 
 
 
-my_pheno_file_all = pd.merge(left=all_dataset, right=my_pheno_file, how='left', left_on='dbGaP_Subject_ID', right_on='dbGaP_Subject_ID')
-my_pheno_file_all_pancan = my_pheno_file_all[my_pheno_file_all['PAN_CAN'] == 1.0].copy()
-my_pheno_file_all_pancan
+#my_pheno_file_all = pd.merge(left=all_dataset, right=my_pheno_file, how='left', left_on='dbGaP_Subject_ID', right_on='dbGaP_Subject_ID')
+#my_pheno_file_all_pancan = my_pheno_file_all[my_pheno_file_all['PAN_CAN'] == 1.0].copy()
+#my_pheno_file_all_pancan['case'] = 2
 
 
 ## Rename dbgap sample id to FIID
 
-my_pheno_file_SHARE = my_pheno_file_SHARE.rename(columns={"dbGaP_Sample_ID": "FIID"})
-my_pheno_file_GARNET = my_pheno_file_GARNET.rename(columns={"dbGaP_Sample_ID": "FIID"})
-my_pheno_file_WHIMS = my_pheno_file_WHIMS.rename(columns={"dbGaP_Sample_ID": "FIID"})
 
+my_pheno_file_SHARE = my_pheno_file_SHARE.rename(columns={"SAMPLE_ID": "FID"})
+my_pheno_file_GARNET = my_pheno_file_GARNET.rename(columns={"SAMPLE_ID": "FID"})
+my_pheno_file_WHIMS = my_pheno_file_WHIMS.rename(columns={"SAMPLE_ID": "FID"})
+
+my_pheno_file_SHARE['IID'] = my_pheno_file_SHARE['FID'].copy()
+my_pheno_file_GARNET['IID'] = my_pheno_file_GARNET['FID'].copy()
+my_pheno_file_WHIMS['IID'] = my_pheno_file_WHIMS['FID'].copy()
 
 
 
@@ -271,34 +315,86 @@ my_pheno_file_WHIMS = my_pheno_file_WHIMS.rename(columns={"dbGaP_Sample_ID": "FI
 
 
 
+
+SHARE_phenogeno_temp1 = my_pheno_file_SHARE[["FID", "IID", "SAMPLE_ORIGIN", "dbGaP_Subject_ID", "AGE",  "race", "HISTORY_DIABETES", "SPANISH_RACE", "BLACK", "PANCREATITIS", "AGE_DIAGNOSED", "DECEASED", "AGE_DEATH", "ENDWHIDY", "AGE_END_FOLLOW","PAN_CAN", "PAN_CAN_LOCATION", "TUMOUR_BEHAVIOUR", "DIAGNOSIS_STATUS", "LATERALITY", "TUMOUR_MORPHOLOGY", "TUMOUR_GRADE", "TUMOUR_SIZE", "TUMOUR_STAGE", "MEAN_BMI", "MEAN_WHR", "PAN_CAN_MONTHS_SURVIVED", "sex", "case"]].copy()
+GARNET_phenogeno_temp1 = my_pheno_file_GARNET[["FID", "IID", "SAMPLE_ORIGIN", "dbGaP_Subject_ID", "AGE",  "race", "HISTORY_DIABETES", "SPANISH_RACE", "BLACK", "PANCREATITIS", "AGE_DIAGNOSED", "DECEASED", "AGE_DEATH", "ENDWHIDY", "AGE_END_FOLLOW", "PAN_CAN", "PAN_CAN_LOCATION", "TUMOUR_BEHAVIOUR", "DIAGNOSIS_STATUS", "LATERALITY", "TUMOUR_MORPHOLOGY", "TUMOUR_GRADE", "TUMOUR_SIZE", "TUMOUR_STAGE", "MEAN_BMI", "MEAN_WHR", "PAN_CAN_MONTHS_SURVIVED", "sex", "case"]].copy()
+WHIMS_phenogeno_temp1 = my_pheno_file_WHIMS[["FID", "IID", "SAMPLE_ORIGIN", "dbGaP_Subject_ID", "AGE",  "race", "HISTORY_DIABETES", "SPANISH_RACE", "BLACK", "PANCREATITIS", "AGE_DIAGNOSED", "DECEASED", "AGE_DEATH", "ENDWHIDY", "AGE_END_FOLLOW","PAN_CAN", "PAN_CAN_LOCATION", "TUMOUR_BEHAVIOUR", "DIAGNOSIS_STATUS", "LATERALITY", "TUMOUR_MORPHOLOGY", "TUMOUR_GRADE", "TUMOUR_SIZE", "TUMOUR_STAGE", "MEAN_BMI", "MEAN_WHR", "PAN_CAN_MONTHS_SURVIVED", "sex", "case"]].copy()
+
+
+GARNET_phenogeno = pd.merge(left= GARNET_geno_samples[['FID']], right=GARNET_phenogeno_temp1, how='left', left_on='FID', right_on='FID')
+WHIMS_phenogeno = pd.merge(left= WHIMS_geno_samples[['FID']], right=WHIMS_phenogeno_temp1, how='left', left_on='FID', right_on='FID')
+
+
+
+
+
+GARNET_phenogeno = GARNET_phenogeno.fillna('nan')
+WHIMS_phenogeno = WHIMS_phenogeno.fillna('nan')
+
+
+
+GARNET_phenofile = pd.merge(left=GARNET_phenogeno[["FID", "IID",]], right=pan_cases[["FID", "case"]], how='left', left_on='FID', right_on='FID')
+GARNET_phenofile['case'] = GARNET_phenofile['case'].fillna(-9)
+
+
+GARNET_phenofile.drop_duplicates(subset=['FID'])
+
+
+my_pheno_file.drop_duplicates(subset=['dbGaP_Subject_ID'])
+SHARE_dataset.drop_duplicates(subset=['dbGaP_Subject_ID'])
+df.drop_duplicates(subset=['brand'])
+
+
+WHIMS_dataset_temp2.drop_duplicates(subset=['FID'])
+
+
+#"PAN_CAN"
+
+
+
+
+
+
+
+df1['Pheno'] = np.where(df2[df2['PAN_CAN'] == 1.0], '2', df1['Pheno'])
+
+
+
+GARNET_geno_samples
+
+df1=GARNET_geno_samples.copy()
+
+df2=GARNET_phenogeno.copy()
+
+
+df=df1['Pheno'].loc[GARNET_phenogeno['PAN_CAN'] == '1.0'] = '2'
+
+outc_cancer_rel4[outc_cancer_rel4['PANCREAS'] == 1.0]
+df2[df2['PAN_CAN'] == 1.0]
+GARNET_phenofile[GARNET_phenofile['case'] == 2]
+
+GARNET_phenogeno[GARNET_phenogeno['case'] == 2]
+
+my_pheno_file[my_pheno_file]
 # Create new df with only covariates
 
-pheno_out_dir = "/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/phenotype_data"
 
-/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/GARNET_dataset
-
-
-SHARE_covar = my_pheno_file_SHARE[["FIID", "FIID", "AGE", "HISTORY_DIABETES", "PANCREATITIS", "MEAN_BMI", "MEAN_WHR"]].copy()
+#
+#/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/GARNET_dataset
 
 
+SHARE_covar = SHARE_phenogeno_temp1.copy()
 
-SHARE_covar = my_pheno_file_SHARE[["FIID", "FIID", "AGE", "HISTORY_DIABETES", "PANCREATITIS", "MEAN_BMI", "MEAN_WHR"]].copy()
-GARNET_covar = my_pheno_file_GARNET[["FIID", "FIID", "AGE", "HISTORY_DIABETES", "PANCREATITIS", "MEAN_BMI", "MEAN_WHR"]].copy()
-WHIMS_covar = my_pheno_file_WHIMS[["FIID", "FIID", "AGE", "HISTORY_DIABETES", "PANCREATITIS", "MEAN_BMI", "MEAN_WHR"]].copy()
-
-
+GARNET_covar = GARNET_phenogeno.copy()
+WHIMS_covar = GARNET_phenogeno.copy()
 
 
-my_pheno_file_SHARE['IID'] = my_pheno_file_SHARE['FIID'].copy()
-my_pheno_file_GARNET['IID'] = my_pheno_file_GARNET['FIID'].copy()
-my_pheno_file_WHIMS['IID'] = my_pheno_file_WHIMS['FIID'].copy()
+# 1=unaffected (control), 2=affected (case) -9 = NA
+
+########################
 
 
-SHARE_phenogeno = my_pheno_file_SHARE[["FIID", "IID", "SAMPLE_ORIGIN", "dbGaP_Subject_ID", "AGE",  "race", "HISTORY_DIABETES", "SPANISH_RACE", "BLACK", "PANCREATITIS", "AGE_DIAGNOSED", "DECEASED", "AGE_DEATH", "ENDWHIDY", "AGE_END_FOLLOW", "PAN_CAN", "PAN_CAN_LOCATION", "TUMOUR_BEHAVIOUR", "DIAGNOSIS_STATUS", "LATERALITY", "TUMOUR_MORPHOLOGY", "TUMOUR_GRADE", "TUMOUR_SIZE", "TUMOUR_STAGE", "MEAN_BMI", "MEAN_WHR", "PAN_CAN_MONTHS_SURVIVED", "sex"]].copy()
-GARNET_phenogeno = my_pheno_file_GARNET[["FIID", "IID", "SAMPLE_ORIGIN", "dbGaP_Subject_ID", "AGE",  "race", "HISTORY_DIABETES", "SPANISH_RACE", "BLACK", "PANCREATITIS", "AGE_DIAGNOSED", "DECEASED", "AGE_DEATH", "ENDWHIDY", "AGE_END_FOLLOW", "PAN_CAN", "PAN_CAN_LOCATION", "TUMOUR_BEHAVIOUR", "DIAGNOSIS_STATUS", "LATERALITY", "TUMOUR_MORPHOLOGY", "TUMOUR_GRADE", "TUMOUR_SIZE", "TUMOUR_STAGE", "MEAN_BMI", "MEAN_WHR", "PAN_CAN_MONTHS_SURVIVED", "sex"]].copy()
-WHIMS_phenogeno = my_pheno_file_WHIMS[["FIID", "IID", "SAMPLE_ORIGIN", "dbGaP_Subject_ID", "AGE",  "race", "HISTORY_DIABETES", "SPANISH_RACE", "BLACK", "PANCREATITIS", "AGE_DIAGNOSED", "DECEASED", "AGE_DEATH", "ENDWHIDY", "AGE_END_FOLLOW", "PAN_CAN", "PAN_CAN_LOCATION", "TUMOUR_BEHAVIOUR", "DIAGNOSIS_STATUS", "LATERALITY", "TUMOUR_MORPHOLOGY", "TUMOUR_GRADE", "TUMOUR_SIZE", "TUMOUR_STAGE", "MEAN_BMI", "MEAN_WHR", "PAN_CAN_MONTHS_SURVIVED", "sex"]].copy()
-
-
+pheno_out_dir = "/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI"
 
 SHARE_covar.to_csv(os.path.join(pheno_out_dir, "SHARE_covar.tsv"), sep='\t', index=False)
 GARNET_covar.to_csv(os.path.join(pheno_out_dir, "GARNET_covar.tsv"), sep='\t', index=False)
@@ -306,6 +402,6 @@ WHIMS_covar.to_csv(os.path.join(pheno_out_dir, "WHIMS_covar.tsv"), sep='\t', ind
 
 
 
-SHARE_phenogeno.to_csv(os.path.join(pheno_out_dir, "SHARE_dataset_phenogeno.tsv"), sep='\t', index=False)
-GARNET_phenogeno.to_csv(os.path.join(pheno_out_dir, "GARNET_dataset_phenogeno.tsv"), sep='\t', index=False)
-WHIMS_phenogeno.to_csv(os.path.join(pheno_out_dir, "WHIMS_dataset_phenogeno.tsv"), sep='\t', index=False)
+SHARE_phenofile.to_csv(os.path.join(pheno_out_dir, "SHARE_dataset_phenogeno.tsv"), sep='\t', index=False)
+GARNET_phenofile.to_csv(os.path.join(pheno_out_dir, "GARNET_dataset_phenogeno.tsv"), sep='\t', index=False)
+WHIMS_phenofile.to_csv(os.path.join(pheno_out_dir, "WHIMS_dataset_phenogeno.tsv"), sep='\t', index=False)
