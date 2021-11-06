@@ -3,35 +3,91 @@
 # manual input
 # Path of the *allchr.pdat input files - (should be the dir used in ${dose2plinkout}"/"${dataset}" from convert-mac-module.sh)
 
-dataset_1_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/WHIMS_dataset
-dataset_2_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/GARNET_dataset
-datasets=()
-datasets=(${dataset_1_dir} ${dataset_2_dir})
+# dataset_1_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/WHIMS_dataset
+# dataset_2_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/GARNET_dataset
+# datasets=()
+# datasets=(${dataset_1_dir} ${dataset_2_dir})
 
 
 # name the prefix for the output
 output_name=whi_test
 
 # output directory for the combined datasets
-out_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/test_combine
+# out_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/test_combine
 script_dir=/home/anbennett2/github/SAP2-GWAS
 
 
 ########################################################################
 
-# JETHRO CREATE INPUT HERE
+Help() {
+   # Display help
+    printf "
+    This script combines datasets.\n\n"
+    printf "Usage:\n\n"
+    echo "-d    Directories of datasets to combine, pass once per directory."
+    echo "-o    Output directory, for outputting data."
+    echo "-h    Print this help."
+    echo ""
+}
 
+# input arguments
+while getopts ":d:o:h" option;
+do
+   case $option in
+        d)
+            datasets+=("$OPTARG")
+            ;;
+        o)
+            out_dir="$OPTARG"
+            ;;
+        h)
+            Help
+            exit 1
+            ;;
+        \?)
+            printf "\nInvalid option passed: -$OPTARG. See usage below.\n"
+            Help
+            exit 1
+            ;;
+   esac
+done
 
+# display help on passing no arguments
+if [ $OPTIND -eq 1 ];
+then
+    Help
+    exit 1
+fi
 
+# check all args given
+for arg in "$datasets" "$out_dir"
+do
+    if [ -n "${!arg}" ]
+    then
+        printf "Error: Missing argument(s). See usage below."
+        Help
+        exit 1
+    fi
+done
 
+# sense check given consent directories exist, can also check for correct data etc.
+for dir in "${datasets[@]}"
+do
+    if [ ! -d "$dir" ]
+    then
+        printf "\n\" $dir \" does not seem to be a valid directory, "
+        printf "please check the directories passed with -d\n\n"
+        exit 1
+    fi
+done
 
+# display a helpful message of inputs
+printf "\Combining directories:\n"
 
-
-
-
-
-########################################################################
-
+for dir in "${datasets[@]}"
+do
+    printf "\t $dir"
+done
 
 
 # Generate the set of SNPs in each dataset #
