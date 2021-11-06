@@ -1,7 +1,8 @@
 #!/bin/bash
 
 #### THIS SCRIPT NEEDS A DOC STRING HERE TO EXPLAIN WHAT IT DOES
-# This script will combine MaCH and minimac imputed data for consent groups from the same study. For example, it can combine the two consent groups of WHI SHARE data available from dbGaP.
+# This script will combine MaCH and minimac imputed data for consent groups from the same study. For example,
+# it can combine the two consent groups of WHI SHARE data available from dbGaP.
 
 Help()
 {
