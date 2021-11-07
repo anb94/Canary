@@ -32,7 +32,7 @@ Help() {
 }
 
 # input arguments
-while getopts ":d:o:h" option;
+while getopts ":d:n:o:h" option;
 do
    case $option in
         d)
