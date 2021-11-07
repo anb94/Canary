@@ -10,11 +10,11 @@
 
 
 # name the prefix for the output
-#output_name=whi_test
+output_name=whi_test
 
 # output directory for the combined datasets
 # out_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/test_combine
-#script_dir=/home/anbennett2/github/SAP2-GWAS
+script_dir=/home/anbennett2/github/SAP2-GWAS
 
 
 ########################################################################
@@ -26,13 +26,12 @@ Help() {
     printf "Usage:\n\n"
     echo "-d    Directories of datasets to combine, pass once per directory."
     echo "-o    Output directory, for outputting data."
-    echo "-n    dataset output naming prefix, for naming things."
     echo "-h    Print this help."
     echo ""
 }
 
 # input arguments
-while getopts ":d:o:n:h" option;
+while getopts ":d:o:h" option;
 do
    case $option in
         d)
@@ -40,9 +39,6 @@ do
             ;;
         o)
             out_dir="$OPTARG"
-            ;;
-        n)
-            dataset="$OPTARG"
             ;;
         h)
             Help
