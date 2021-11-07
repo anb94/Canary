@@ -92,8 +92,8 @@ WHIMS_genodir= "/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/WHIMS
 
 
 
-GARNET_geno_samples = pd.read_csv(os.path.join(GARNET_genodir, "GARNET_allchr.pfam"), sep="\t", comment="#", names=["FID", "IID", "In-Fam-ID-Dad", "In-Fam-ID-Mum", "SEX", "Pheno"])
-WHIMS_geno_samples = pd.read_csv(os.path.join(WHIMS_genodir, "WHIMS_allchr.pfam"), sep="\t", comment="#", names=["FID", "IID", "In-Fam-ID-Dad", "In-Fam-ID-Mum", "SEX", "Pheno"])
+GARNET_geno_samples = pd.read_csv(os.path.join(GARNET_genodir, "GARNET_allchr.tsv"), sep="\t", comment="#", names=["FID", "IID", "In-Fam-ID-Dad", "In-Fam-ID-Mum", "SEX", "Pheno"])
+WHIMS_geno_samples = pd.read_csv(os.path.join(WHIMS_genodir, "WHIMS_allchr.tsv"), sep="\t", comment="#", names=["FID", "IID", "In-Fam-ID-Dad", "In-Fam-ID-Mum", "SEX", "Pheno"])
 
 
 WHI_Sample_filt_746 = WHI_Sample[WHI_Sample.STUDY.str.match('phs000746')]

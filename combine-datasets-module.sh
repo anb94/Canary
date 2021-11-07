@@ -90,6 +90,36 @@ do
 done
 
 
+#### Define recursive_comm function that will be used in later steps to recurvisely compare files:
+
+
+function recursive_comm {
+    if [ "$#" -eq 2 ]; then
+        comm -12 "$1" "$2"
+    else
+        currFile="$1"
+        shift
+        comm -12 "$currFile" <(recursive_comm "$@")
+    fi
+}
+
+
+if [ "$#" -lt "2" ]; then
+    echo "multi_comm requires 2 or more files"
+    exit 1
+fi
+
+recursive_comm "$@"
+
+
+
+
+
+
+############### Pipeline Start ###############
+
+
+
 # Generate the set of SNPs in each dataset #
 for i in "${datasets[@]}"; do
   echo "Generating SNP set for "${i}""
@@ -105,7 +135,7 @@ echo "Completed Generating SNP sets"
 
 echo "Generating file of shared snps between the datasets"
 # Use the script multi_comm to compare all input files for common SNPs
-"${script_dir}"/multi_comm.sh  "${out_dir}"/*_snp-set.tsv > "${out_dir}"/"${output_name}"_sharedsnps.tsv
+recursive_comm  "${out_dir}"/*_snp-set.tsv > "${out_dir}"/"${output_name}"_sharedsnps.tsv
 
 
 # NOTE: if any errors occur in this step, they are also likely to occur in the step below as the code is very similar #
@@ -130,7 +160,7 @@ for i in "${datasets[@]}"; do
 done
 echo "Completed Generating map files for datasets"
 
-"${script_dir}"/multi_comm.sh "${out_dir}"/*_tempmap1.tsv > "${out_dir}"/"${output_name}"__tempmap2.tsv
+recursive_comm "${out_dir}"/*_tempmap1.tsv > "${out_dir}"/"${output_name}"__tempmap2.tsv
 
 
 
@@ -184,15 +214,21 @@ done
 
 
 
-rm -rf "${out_dir}"/"${output_name}"_plink.txt
+rm -rf "${out_dir}"/"${output_name}"_plink1.txt
 for i in "${datasets[@]}"; do
   dtst=$(basename "$i")
-  echo "${i}"/"${dtst}"_plink1_temp1 >> "${out_dir}"/"${output_name}"_plink.txt
+  echo "${i}"/"${dtst}"_plink1_temp1 >> "${out_dir}"/"${output_name}"_plink1.txt
 done
 
 
+rm -rf "${out_dir}"/"${output_name}"_plink2.txt
+for i in "${datasets[@]}"; do
+  dtst=$(basename "$i")
+  echo "${i}"/"${dtst}"_plink2_temp1 >> "${out_dir}"/"${output_name}"_plink2.txt
+done
 
-plink --merge-list "${out_dir}"/"${output_name}"_plink.txt --make-bed --out "${out_dir}"/"${output_name}"_temp2
+
+plink --merge-list "${out_dir}"/"${output_name}"_plink1.txt --make-bed --out "${out_dir}"/"${output_name}"_temp2
 
 
 #plink2 --pmerge "${dataset_1_dir}"/WHIMS_dataset_plink2_temp1 "${dataset_2_dir}"/GARNET_dataset_plink2_temp1 --make-pgen --out "${out_dir}"/"${output_name}"_temp2
