@@ -26,6 +26,7 @@ Help() {
     printf "Usage:\n\n"
     echo "-d    Directories of datasets to combine, pass once per directory."
     echo "-o    Output directory, for outputting data."
+    echo "-n    dataset output naming prefix, for naming things."
     echo "-h    Print this help."
     echo ""
 }
@@ -40,6 +41,9 @@ do
         o)
             out_dir="$OPTARG"
             ;;
+        n)
+                dataset="$OPTARG"
+                ;;
         h)
             Help
             exit 1
