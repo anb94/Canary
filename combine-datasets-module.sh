@@ -42,8 +42,8 @@ do
             out_dir="$OPTARG"
             ;;
         n)
-                dataset="$OPTARG"
-                ;;
+            output_name="$OPTARG"
+            ;;
         h)
             Help
             exit 1
