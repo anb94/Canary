@@ -64,7 +64,7 @@ then
 fi
 
 # check all args given
-for arg in "$datasets" "$out_dir"
+for arg in "$datasets" "$output_name" "$out_dir"
 do
     if [ -n "${!arg}" ]
     then
@@ -92,6 +92,8 @@ for dir in "${datasets[@]}"
 do
     printf "\t $dir"
 done
+
+printf "\n\nName prefix: $dataset\n"
 
 
 #### Define recursive_comm function that will be used in later steps to recurvisely compare files:
