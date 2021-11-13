@@ -86,15 +86,15 @@ do
 done
 
 # display a helpful message of inputs
-printf "\nCombining directories:\n"
+printf "\nCombining directories (-d):\n"
 
 for dir in "${datasets[@]}"
 do
     printf "\n\t $dir"
 done
 
-printf "\n\nOuputting to: ${out_dir}\n"
-printf "\nOutput file prefix: ${output_name}\n\n"
+printf "\n\nOuputting to (-o): ${out_dir}\n"
+printf "\nOutput file prefix (-n): ${output_name}\n\n"
 
 
 #### Define recursive_comm function that will be used in later steps to recurvisely compare files:
@@ -122,6 +122,7 @@ unset IFS
 # find all common snps between files
 recursive_comm "${snp_set_files[@]}" > "${out_dir}"/"${output_name}"_sharedsnps.tsv
 
+exit 1
 
 ############### Pipeline Start ###############
 
