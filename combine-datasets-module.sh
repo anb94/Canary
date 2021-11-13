@@ -100,6 +100,7 @@ printf "\nOutput file prefix: ${output_name}\n\n"
 #### Define recursive_comm function that will be used in later steps to recurvisely compare files:
 function recursive_comm {
     # function to get all common snps between an array of files
+    # expects a single input of an array of files to compare
     arr=( "$@" )
 
     if [ "${#arr[@]}" -eq 2 ]; then
