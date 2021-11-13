@@ -122,10 +122,9 @@ unset IFS
 # find all common snps between files
 recursive_comm "${snp_set_files[@]}" > "${out_dir}"/"${output_name}"_sharedsnps.tsv
 
-exit 1
+
 
 ############### Pipeline Start ###############
-
 
 
 # Generate the set of SNPs in each dataset #
