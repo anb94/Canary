@@ -1,0 +1,92 @@
+
+head -n 1 *allchr.pdat > pdatsamp.tsv
+
+
+
+
+
+############### PYTHON #############
+
+import pandas as pd
+
+pdatsamp2 = pd.read_csv('/scratch/anbennett2/datasets/processed_data/dbgap/WHI/GARNET_dataset/pdatsamp.tsv', sep="\t", comment="#", as_in)
+pfamsamp = pd.read_csv('/scratch/anbennett2/datasets/processed_data/dbgap/WHI/GARNET_dataset/samples.tsv', sep="\t", comment="#")
+
+print(len(pdatsamp.columns))
+
+test=pdatsamp.wide_to_long()
+
+
+test=pdatsamp.T
+
+print(test.head(10))
+
+
+
+pdatsamp.iloc[0]
+
+
+test.columns.values[0] = "SAMPLE_ID"
+
+
+#
+> pdatsamp = pd.read_csv('/scratch/anbennett2/datasets/processed_data/dbgap/WHI/GARNET_dataset/pdatsamp.tsv', sep="\t
+", comment="#")
+pdatsamp.drop(['SNP','A1','A2'],axis=1)
+
+pdatsamp.drop(['SNP','A1','A2'],axis=1, inplace=True)
+test=pdatsamp.T
+
+
+
+
+
+
+test3 = test2.reset_index()
+
+
+
+
+gawk '{print $1,$2,$3, $4, 2, $6}' GARNET_allchr.pfam > test.tsv
+
+
+
+
+SHARE_pfam_aa['3'].loc[SHARE_pfam_aa['IID'] == 'D377180'] = 'D341589'
+
+
+
+
+gawk 'END{print NR}' *_allchr.pfam
+gawk 'END{print NF}' *_allchr.pdat
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+pan_can = pd.DataFrame()
+pan_can = outc_cancer_rel4[['dbGaP_Subject_ID', 'PANCREAS']].copy()
+pan_can['case'] = pan_can['PANCREAS'].copy()
+pan_can.loc[pan_can['case'] == 1.0, 'case'] = 2
+pan_can.case = pan_can.case.fillna(1)
+
+
+
+
+form80_BMI=form80.groupby(by='dbGaP_Subject_ID')['BMIX'].mean()
+form80_BMI=pd.DataFrame(form80_BMI)
+form80_BMI.reset_index(inplace=True)
+
+form80_WHRX=form80.groupby(by='dbGaP_Subject_ID')['WHRX'].mean()
+form80_WHRX=pd.DataFrame(form80_WHRX)
+form80_WHRX.reset_index(inplace=True)
