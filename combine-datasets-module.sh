@@ -92,7 +92,6 @@ done
 
 printf "output dir: ${out_dir}"
 
-exit 1
 
 #### Define recursive_comm function that will be used in later steps to recurvisely compare files:
 
