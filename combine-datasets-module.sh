@@ -59,15 +59,15 @@ then
 fi
 
 # check all args given
-#for arg in "$datasets" "$out_dir"
-#do
-#    if [ -n "${!arg}" ]
-#    then
-#        printf "Error: Missing argument(s). See usage below."
-#        Help
-#        exit 1
-#    fi
-#done
+for arg in "$datasets" "$out_dir"
+do
+    if [ -n "${!arg}" ]
+    then
+        printf "Error: Missing argument(s). See usage below."
+        Help
+        exit 1
+    fi
+done
 
 # sense check given consent directories exist, can also check for correct data etc.
 for dir in "${datasets[@]}"
