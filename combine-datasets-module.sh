@@ -3,17 +3,17 @@
 # manual input
 # Path of the *allchr.pdat input files - (should be the dir used in ${dose2plinkout}"/"${dataset}" from convert-mac-module.sh)
 
- dataset_1_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/WHIMS_dataset
- dataset_2_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/GARNET_dataset
- datasets=()
- datasets=(${dataset_1_dir} ${dataset_2_dir})
+ #dataset_1_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/WHIMS_dataset
+ #dataset_2_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/GARNET_dataset
+ #datasets=()
+ #datasets=(${dataset_1_dir} ${dataset_2_dir})
 
 
 # name the prefix for the output
-output_name=whi_test
+#output_name=whi_test
 
 # output directory for the combined datasets
-out_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/test_combine
+#out_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/test_combine
 
 
 ########################################################################
