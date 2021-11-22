@@ -10,7 +10,8 @@
 
 
 # name the prefix for the output
-#output_name=whi_test
+# output_name=whi_test
+
 
 # output directory for the combined datasets
 #out_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/test_combine
@@ -25,12 +26,13 @@ Help() {
     printf "Usage:\n\n"
     echo "-d    Directories of datasets to combine, pass once per directory."
     echo "-o    Output directory, for outputting data."
+    echo "-n    dataset output naming prefix, for naming things."
     echo "-h    Print this help."
     echo ""
 }
 
 # input arguments
-while getopts ":d:o:h" option;
+while getopts ":d:o:n:h" option;
 do
    case $option in
         d)
@@ -38,6 +40,9 @@ do
             ;;
         o)
             out_dir="$OPTARG"
+            ;;
+        n)
+            output_name="$OPTARG"
             ;;
         h)
             Help
@@ -59,7 +64,7 @@ then
 fi
 
 # check all args given
-for arg in "$datasets" "$out_dir"
+for arg in "$datasets" "$out_dir" "$output_name"
 do
     if [ -n "${!arg}" ]
     then
@@ -81,12 +86,16 @@ do
 done
 
 # display a helpful message of inputs
-printf "\Combining directories:\n"
+printf "\nCombining directories (-d):\n"
 
 for dir in "${datasets[@]}"
 do
-    printf "\t $dir"
+    printf "\n\t $dir"
 done
+
+
+printf "\n\nOuputting to (-o): ${out_dir}\n"
+printf "\nOutput file prefix (-n): ${output_name}\n\n"
 
 
 
@@ -96,13 +105,21 @@ printf "output dir: ${out_dir}"
 #### Define recursive_comm function that will be used in later steps to recurvisely compare files:
 
 
+
+#### Define recursive_comm function that will be used in later steps to recurvisely compare files:
 function recursive_comm {
-    if [ "$#" -eq 2 ]; then
-        comm -12 "$1" "$2"
+    # function to get all common snps between an array of files
+    # expects a single input of an array of files to compare
+    arr=( "$@" )
+
+    if [ "${#arr[@]}" -eq 2 ]; then
+        comm -12 "${arr[0]}" "${arr[1]}"
     else
-        currFile="$1"
-        shift
-        comm -12 "$currFile" <(recursive_comm "$@")
+        # get current file and drop from array
+        currFile="${arr[0]}"
+        arr=("${arr[@]:1}")
+
+        comm -12 "$currFile" <(recursive_comm "${arr[@]}")
     fi
 }
 
@@ -121,8 +138,8 @@ function recursive_comm {
 
 
 
-############### Pipeline Start ###############
 
+############### Pipeline Start ###############
 
 
 # Generate the set of SNPs in each dataset #
@@ -137,6 +154,16 @@ for i in "${datasets[@]}"; do
   echo "Finished generating SNP set for "${i}""
 done
 echo "Completed Generating SNP sets"
+
+
+
+# build array of all snp-set tsvs in given output dir
+IFS=$'\n'
+snp_set_files=($(find "${out_dir}" -name "*_snp-set.tsv"))
+unset IFS
+
+# find all common snps between files
+recursive_comm "${snp_set_files[@]}" > "${out_dir}"/"${output_name}"_sharedsnps.tsv
 
 echo "Generating file of shared snps between the datasets"
 # Use the script multi_comm to compare all input files for common SNPs
