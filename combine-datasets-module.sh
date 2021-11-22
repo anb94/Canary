@@ -66,7 +66,7 @@ fi
 # check all args given
 for arg in "$datasets" "$out_dir" "$output_name"
 do
-    if [ -n "${!arg}" ]
+    if [ -z ${arg+x} ];
     then
         printf "Error: Missing argument(s). See usage below."
         Help
