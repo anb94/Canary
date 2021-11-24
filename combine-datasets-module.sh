@@ -238,7 +238,7 @@ for i in "${datasets[@]}"; do
   --covar "${i}"/"${dtst}"_covar.tsv \
   --make-pgen \
   --out "${i}"/"${dtst}"_plink2_temp1
-#echo "converting "${i}" into plink1 format"
+echo "converting "${i}" into plink1 format"
   plink2 --pfile "${i}"/"${dtst}"_plink2_temp1 \
   --make-bed \
   --out "${i}"/"${dtst}"_plink1_temp1
@@ -253,11 +253,11 @@ for i in "${datasets[@]}"; do
 done
 
 
-rm -rf "${out_dir}"/"${output_name}"_plink2.txt
-for i in "${datasets[@]}"; do
-  dtst=$(basename "$i")
-  echo "${i}"/"${dtst}"_plink2_temp1 >> "${out_dir}"/"${output_name}"_plink2.txt
-done
+#rm -rf "${out_dir}"/"${output_name}"_plink2.txt
+#for i in "${datasets[@]}"; do
+#  dtst=$(basename "$i")
+#  echo "${i}"/"${dtst}"_plink2_temp1 >> "${out_dir}"/"${output_name}"_plink2.txt
+#done
 
 
 plink --merge-list "${out_dir}"/"${output_name}"_plink1.txt --make-bed --out "${out_dir}"/"${output_name}"_temp2
@@ -267,41 +267,54 @@ plink --merge-list "${out_dir}"/"${output_name}"_plink1.txt --make-bed --out "${
 
 
 
+# Correct bfiles of plink1 files ##
+
+#gawk 'BEGIN{FS="\t"; OFS="\t"}{print $3}' "${out_dir}"/"${output_name}"_temp2*.bim | gawk 'BEGIN{FS=":";OFS="\t"}{print $1,$2}' > "${out_dir}"/"${output_name}"_temp2_chrpos.bim
+gawk 'BEGIN{FS="\t"; OFS="\t"}{print $2}' "${out_dir}"/"${output_name}"_temp2.bim | gawk 'BEGIN{FS=":";OFS="\t"}{print $1,$2}'  > "${out_dir}"/"${output_name}"_temp2_chrpos.bim
 
 
+paste "${out_dir}"/"${output_name}"_temp2*.bim "${out_dir}"/"${output_name}"_temp2_chrpos.bim > "${out_dir}"/"${output_name}"_temp2_w_chrpos.bim
+paste "${out_dir}"/"${output_name}"_temp2.bim "${out_dir}"/"${output_name}"_temp2_chrpos.bim > "${out_dir}"/"${output_name}"_temp2_w_chrpos.bim
 
 
+#gawk 'BEGIN{FS="\t";OFS="\t"}{print $7,$2,$3,$8,$5, $6}'  "${out_dir}"/"${output_name}"_temp2_w_chrpos.pvar > "${out_dir}"/"${output_name}"_temp2_updated.pvar
+gawk 'BEGIN{FS="\t";OFS="\t"}{print $7,$2,$3,$8,$5, $6}' "${out_dir}"/"${output_name}"_temp2_w_chrpos.bim  > "${out_dir}"/"${output_name}"_temp2_updated.bim
 
 
+echo "Copying other files in the set for plink compatibility..."
+cp "${out_dir}"/"${output_name}"_temp2.bed "${out_dir}"/"${output_name}"_temp2_updated.bed
+cp  "${out_dir}"/"${output_name}"_temp2.fam "${out_dir}"/"${output_name}"_temp2_updated.fam
+echo "Done"
 
-## Step 3.2: Correct pfiles ##
+
+## Correct pfiles of plink2 files ##
 
 # Once the files have been imported into plink format the chromosome and position information must be updated as they are currently null.
 # To do this we will use information that is present within the pvar file.
 
-echo "Generating files for "${output_name}" "
+#echo "Generating files for "${output_name}" "
 
 
 # Print the 3rd column called ID from the pvar file and split it based on ':' then take the first and second element. Take off the header and add a new header and add to new file
-echo "Taking ID and splitting into chromosome and position for later use..."
-gawk 'BEGIN{FS="\t"; OFS="\t"}{print $3}' "${out_dir}"/"${output_name}"_temp2*.pvar | gawk 'BEGIN{FS=":";OFS="\t"}{print $1,$2}' | tail -n+2 | sed '1i #CHROM POS' > "${out_dir}"/"${output_name}"_temp2_chrpos.pvar
+#echo "Taking ID and splitting into chromosome and position for later use..."
+#gawk 'BEGIN{FS="\t"; OFS="\t"}{print $3}' "${out_dir}"/"${output_name}"_temp2*.pvar | gawk 'BEGIN{FS=":";OFS="\t"}{print $1,$2}' | tail -n+2 | sed '1i #CHROM POS' > "${out_dir}"/"${output_name}"_temp2_chrpos.pvar
 
 
 # Paste the original pvar and the new intermediate file into another intermediate file
-echo "Making temporary file..."
-paste "${out_dir}"/"${output_name}"_temp2*.pvar "${out_dir}"/"${output_name}"_temp2_chrpos.pvar > "${out_dir}"/"${output_name}"_temp2_w_chrpos.pvar
+#echo "Making temporary file..."
+#paste "${out_dir}"/"${output_name}"_temp2*.pvar "${out_dir}"/"${output_name}"_temp2_chrpos.pvar > "${out_dir}"/"${output_name}"_temp2_w_chrpos.pvar
 
 
 
 # Make a new pvar file with the corrected columns
 
-echo "Make new pvar file with correct chromosome and position information..."
-gawk 'BEGIN{FS="\t";OFS="\t"}{print $6,$7,$3,$4,$5}' "${out_dir}"/"${output_name}"_temp2_w_chrpos.pvar > "${out_dir}"/"${output_name}"_temp2_updated.pvar
+#echo "Make new pvar file with correct chromosome and position information..."
+#gawk 'BEGIN{FS="\t";OFS="\t"}{print $6,$7,$3,$4,$5}' "${out_dir}"/"${output_name}"_temp2_w_chrpos.pvar > "${out_dir}"/"${output_name}"_temp2_updated.pvar
 
 
 # Copy the other pfiles with a matching name so that plink2 knows they are together.
 
-echo "Copying other files in the set for plink compatibility..."
-cp "${out_dir}"/"${output_name}"_temp2*.psam "${out_dir}"/"${output_name}"_temp_updated.psam
-cp  "${out_dir}"/"${output_name}"_temp2*.pgen "${out_dir}"/"${output_name}"_temp_updated.pgen
+#echo "Copying other files in the set for plink compatibility..."
+#cp "${out_dir}"/"${output_name}"_temp2*.psam "${out_dir}"/"${output_name}"_temp2_updated.psam
+#cp  "${out_dir}"/"${output_name}"_temp2*.pgen "${out_dir}"/"${output_name}"_temp2_updated.pgen
 echo "Done"
