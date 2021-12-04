@@ -79,7 +79,7 @@ printf "\n\nName prefix: $dataset\n"
 gawk 'BEGIN{FS="\t"; OFS="\t"}{print $2}' "${dataset_dir}"/"${dataset}"_plink1_temp1.bim | gawk 'BEGIN{FS=":";OFS="\t"}{print $1,$2}'  > "${dataset_dir}"/"${dataset}"_plink1_temp1_chrpos.bim
 
 
-paste "${dataset_dir}"/"${dataset}"_plink1__temp1*.bim "${dataset_dir}"/"${dataset}"_plink1_temp1_chrpos.bim > "${dataset_dir}"/"${dataset}"_plink1_temp1_w_chrpos.bim
+paste "${dataset_dir}"/"${dataset}"_plink1_temp1*.bim "${dataset_dir}"/"${dataset}"_plink1_temp1_chrpos.bim > "${dataset_dir}"/"${dataset}"_plink1_temp1_w_chrpos.bim
 #paste "${dataset_dir}"/"${dataset}"_temp2.bim "${dataset_dir}"/"${dataset}"_temp2_chrpos.bim > "${dataset_dir}"/"${dataset}"_temp2_w_chrpos.bim
 
 
