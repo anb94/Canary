@@ -1,0 +1,96 @@
+Bootstrap: docker
+From: ubuntu:18.04
+
+%post
+  # Update the package manager
+    apt-get update
+    apt-get upgrade -y
+  # Install necessary packages
+    apt install -y python3 python3-pip build-essential software-properties-common wget ubuntu-drivers-common tar bzip2 curl sed plink zip zlib1g-dev gawk
+    apt-get update
+    apt-get upgrade -y
+    pip3 install --upgrade pip
+    pip3 install numpy pandas bgen-reader pybgen biopython
+    apt-get update
+    apt-get upgrade -y
+
+  # Installing sra-toolkit
+    ## Change to root directory
+    cd /
+    ## Download SRA toolkit from ncbi
+    wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.10.8/sratoolkit.2.10.8-ubuntu64.tar.gz
+    ## Extract the toolkit
+    tar -xzf sratoolkit.2.10.8-ubuntu64.tar.gz
+    ## Remove the extracted toolkit
+    rm -rf sratoolkit.2.10.8-ubuntu64.tar.gz
+
+  # Installing GCTA
+    ## Change to root directory
+    cd /
+    mkdir gcta
+    cd gcta
+    # Download the file
+    wget https://cnsgenomics.com/software/gcta/bin/gcta_1.93.2beta.zip
+    # Unzip the file
+    unzip gcta_1.93.2beta.zip
+    # Remove zip file
+    rm -rf gcta_1.93.2beta.zip
+
+  # install plink1.9
+    #change to root directory
+    cd /
+    mkdir plink1
+    cd plink1
+    #download plink1.9
+    wget -O plink.zip https://s3.amazonaws.com/plink1-assets/plink_linux_x86_64_20210416.zip
+    #unzip
+    unzip plink.zip
+    #remove plink.zip
+    rm -rf plink.zip
+
+
+  # Install plink2
+    ## Change to root directort
+    cd /
+    mkdir plink2
+    cd plink2
+    ## Download plink2
+    #wget -O plink2.zip https://s3.amazonaws.com/plink2-assets/alpha2/plink2_linux_x86_64.zip
+    wget -O plink2.zip https://s3.amazonaws.com/plink2-assets/plink2_linux_x86_64_20211011.zip
+    ## unzip the file
+    unzip plink2.zip
+    ## remove the zip file
+    rm -rf plink2.zip
+
+  # Download and install dose2plink
+	  cd /
+    curl -O https://raw.githubusercontent.com/anb94/plink-ng/master/1.9/dose2plink.c
+    gcc /dose2plink.c -lz -o /dose2plink
+    mkdir dosetoplink
+    mv /dose2plink /dosetoplink
+
+
+
+
+  # Install R and R packages
+
+    ln -fs /usr/share/zoneinfo/Europe/London /etc/localtime
+    apt-get install -y default-jre openjdk-11-jre-headless openjdk-8-jre-headless default-jdk libcurl4 libcurl4-openssl-dev libxml2-dev libssl-dev
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+    add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/"
+    add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ bionic-backports main restricted universe"
+    apt-get update
+    apt-get upgrade -y
+    apt-get install -y r-base r-base-dev
+    R -e "install.packages('BiocManager'); library('BiocManager'); BiocManager::install('GWASTools')"
+    R -e 'install.packages(c("tidyverse","qqman"), lib="/usr/local/lib/R/site-library")'
+
+%environment
+    export LC_ALL=C
+    export PATH=/sratoolkit.2.10.8-ubuntu64/bin:$PATH
+    export PATH=$PATH:/gcta
+    export PATH=$PATH:/plink2
+    export PATH=$PATH:/plink1
+    export PATH=$PATH:/dosetoplink
+    export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true
+    export TZ=Europe/London
