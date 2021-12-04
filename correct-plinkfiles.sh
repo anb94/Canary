@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#dataset_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/test_combine
-#dataset=whi_test
+dataset_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/WHIMS_dataset
+dataset=WHIMS
 
 
 ########################################################################
@@ -76,20 +76,20 @@ printf "\n\nName prefix: $dataset\n"
 # Correct bfiles of plink1 files ##
 
 #gawk 'BEGIN{FS="\t"; OFS="\t"}{print $3}' "${dataset_dir}"/"${dataset}"_temp2*.bim | gawk 'BEGIN{FS=":";OFS="\t"}{print $1,$2}' > "${dataset_dir}"/"${dataset}"_temp2_chrpos.bim
-gawk 'BEGIN{FS="\t"; OFS="\t"}{print $2}' "${dataset_dir}"/"${dataset}"_temp2.bim | gawk 'BEGIN{FS=":";OFS="\t"}{print $1,$2}'  > "${dataset_dir}"/"${dataset}"_temp2_chrpos.bim
+gawk 'BEGIN{FS="\t"; OFS="\t"}{print $2}' "${dataset_dir}"/"${dataset}"_temp1.bim | gawk 'BEGIN{FS=":";OFS="\t"}{print $1,$2}'  > "${dataset_dir}"/"${dataset}"_temp1_chrpos.bim
 
 
-paste "${dataset_dir}"/"${dataset}"_temp2*.bim "${dataset_dir}"/"${dataset}"_temp2_chrpos.bim > "${dataset_dir}"/"${dataset}"_temp2_w_chrpos.bim
-paste "${dataset_dir}"/"${dataset}"_temp2.bim "${dataset_dir}"/"${dataset}"_temp2_chrpos.bim > "${dataset_dir}"/"${dataset}"_temp2_w_chrpos.bim
+paste "${dataset_dir}"/"${dataset}"_temp1*.bim "${dataset_dir}"/"${dataset}"_temp1_chrpos.bim > "${dataset_dir}"/"${dataset}"_temp1_w_chrpos.bim
+#paste "${dataset_dir}"/"${dataset}"_temp2.bim "${dataset_dir}"/"${dataset}"_temp2_chrpos.bim > "${dataset_dir}"/"${dataset}"_temp2_w_chrpos.bim
 
 
 #gawk 'BEGIN{FS="\t";OFS="\t"}{print $7,$2,$3,$8,$5, $6}'  "${dataset_dir}"/"${dataset}"_temp2_w_chrpos.pvar > "${dataset_dir}"/"${dataset}"_temp2_updated.pvar
-gawk 'BEGIN{FS="\t";OFS="\t"}{print $7,$2,$3,$8,$5, $6}' "${dataset_dir}"/"${dataset}"_temp2_w_chrpos.bim  > "${dataset_dir}"/"${dataset}"_temp2_updated.bim
+gawk 'BEGIN{FS="\t";OFS="\t"}{print $7,$2,$3,$8,$5, $6}' "${dataset_dir}"/"${dataset}"_temp1_w_chrpos.bim  > "${dataset_dir}"/"${dataset}"_temp1_updated.bim
 
 
 echo "Copying other files in the set for plink compatibility..."
-cp "${dataset_dir}"/"${dataset}"_temp2.bed "${dataset_dir}"/"${dataset}"_temp2_updated.bed
-cp  "${dataset_dir}"/"${dataset}"_temp2.fam "${dataset_dir}"/"${dataset}"_temp2_updated.fam
+cp "${dataset_dir}"/"${dataset}"_temp1.bed "${dataset_dir}"/"${dataset}"_temp1_updated.bed
+cp  "${dataset_dir}"/"${dataset}"_temp1.fam "${dataset_dir}"/"${dataset}"_temp1_updated.fam
 echo "Done"
 
 

@@ -227,7 +227,7 @@ gawk 'BEGIN{FS="\t"; OFS="\t"}{print $2}' "${out_dir}"/"${output_name}"_temp2.bi
 
 
 paste "${out_dir}"/"${output_name}"_temp2*.bim "${out_dir}"/"${output_name}"_temp2_chrpos.bim > "${out_dir}"/"${output_name}"_temp2_w_chrpos.bim
-paste "${out_dir}"/"${output_name}"_temp2.bim "${out_dir}"/"${output_name}"_temp2_chrpos.bim > "${out_dir}"/"${output_name}"_temp2_w_chrpos.bim
+#paste "${out_dir}"/"${output_name}"_temp2.bim "${out_dir}"/"${output_name}"_temp2_chrpos.bim > "${out_dir}"/"${output_name}"_temp2_w_chrpos.bim
 
 
 #gawk 'BEGIN{FS="\t";OFS="\t"}{print $7,$2,$3,$8,$5, $6}'  "${out_dir}"/"${output_name}"_temp2_w_chrpos.pvar > "${out_dir}"/"${output_name}"_temp2_updated.pvar
