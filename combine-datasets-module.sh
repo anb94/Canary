@@ -3,20 +3,6 @@
 # manual input
 # Path of the *allchr.pdat input files - (should be the dir used in ${dose2plinkout}"/"${dataset}" from convert-mac-module.sh)
 
- #dataset_1_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/WHIMS_dataset
- #dataset_2_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/GARNET_dataset
- #datasets=()
- #datasets=(${dataset_1_dir} ${dataset_2_dir})
-
-
-# name the prefix for the output
-# output_name=whi_test
-
-
-# output directory for the combined datasets
-#out_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/test_combine
-
-
 ########################################################################
 
 Help() {
@@ -124,19 +110,6 @@ function recursive_comm {
 }
 
 
-####################
-
-#if [ "$#" -lt "2" ]; then
-#    echo "multi_comm requires 2 or more files"
-#    exit 1
-#fi
-
-#recursive_comm "$@"
-
-####################
-
-
-
 
 
 ############### Pipeline Start ###############
@@ -192,24 +165,6 @@ for i in "${datasets[@]}"; do
 done
 echo "Completed Generating map files for datasets"
 
-#recursive_comm "${out_dir}"/*_tempmap1.tsv > "${out_dir}"/"${output_name}"__tempmap2.tsv
-
-
-
-
-
-
-# ########################### ########################### ########################### ########################### ##########################
-
-#  tail -n +2  "${i}"/*_allchr.pdat | gawk '{print 0,$1,$0}' > "${out_dir}"/"${dtst}"_tempmap1.tsv
-#tail -n +2 "${i}"/*_allchr.pdat > "${out_dir}"/"${dtst}"_temp_allchr.pdat
-#sort --buffer-size=64 "${out_dir}"/"${dtst}"_temp_allchr.pdat -o "${out_dir}"/"${dtst}"_tempmap1.tsv
-# Use the script multi_comm to compare all input files for common SNPs
-# map file must contain a header since header was removed in the above for loop - take header from the first pdat file in array.
-#gawk '{print 0,$1,0,0}' "${datasets[0]}"/*_allchr.pdat | head -n 1 > "${out_dir}"/"${output_name}".map
-#gawk '{print 0,$1,0,0}' "${out_dir}"/"${output_name}"__tempmap2.tsv >> "${out_dir}"/"${output_name}".map
-# ########################### ########################### ########################### ########################### ##########################
-
 
 
 
@@ -252,7 +207,6 @@ for i in "${datasets[@]}"; do
   echo "${i}"/"${dtst}"_plink1_temp1 >> "${out_dir}"/"${output_name}"_plink1.txt
 done
 
-
 #rm -rf "${out_dir}"/"${output_name}"_plink2.txt
 #for i in "${datasets[@]}"; do
 #  dtst=$(basename "$i")
@@ -260,9 +214,8 @@ done
 #done
 
 
+
 plink --merge-list "${out_dir}"/"${output_name}"_plink1.txt --make-bed --out "${out_dir}"/"${output_name}"_temp2
-
-
 #plink2 --pmerge "${dataset_1_dir}"/WHIMS_dataset_plink2_temp1 "${dataset_2_dir}"/GARNET_dataset_plink2_temp1 --make-pgen --out "${out_dir}"/"${output_name}"_temp2
 
 
