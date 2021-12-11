@@ -105,7 +105,7 @@ WHIMS_dataset_temp1= pd.merge(left=WHIMS_geno_samples, right=WHI_Sample_filt_746
 
 
 
-# check for dups:
+# check for duplicates:
 
 GARNET_dataset_temp1.drop_duplicates(subset=['SAMPLE_ID'])
 WHIMS_dataset_temp1.drop_duplicates(subset=['SAMPLE_ID'])
@@ -225,9 +225,6 @@ my_pheno_file.AGE_END_FOLLOW = my_pheno_file.AGE + (my_pheno_file.AGE_END_FOLLOW
 
 
 
-
-
-
 GARNET_dataset_temp2 = pd.merge(left=GARNET_dataset_temp1, right=my_pheno_file, how='left', left_on='dbGaP_Subject_ID', right_on='dbGaP_Subject_ID')
 WHIMS_dataset_temp2 = pd.merge(left=WHIMS_dataset_temp1, right=my_pheno_file, how='left', left_on='dbGaP_Subject_ID', right_on='dbGaP_Subject_ID')
 
@@ -241,8 +238,6 @@ WHIMS_dataset_temp2[WHIMS_dataset_temp2['case'] == 2]
 
 
 
-
-
 GARNET_dataset_pfam = GARNET_dataset_temp2[['FID', 'IID', 'In-Fam-ID-Dad', 'In-Fam-ID-Mum', 'sex', 'case']].copy()
 GARNET_dataset_pfam['case'] = GARNET_dataset_pfam ['case'].fillna(1)
 
@@ -253,27 +248,51 @@ WHIMS_dataset_pfam['case'] = WHIMS_dataset_pfam ['case'].fillna(1)
 
 
 GARNET_dataset_pheno=GARNET_dataset_pfam[['FID', 'IID', 'case']].copy()
-
 WHIMS_dataset_pheno=WHIMS_dataset_pfam[['FID', 'IID', 'case']].copy()
 
 
-GARNET_dataset_covar=GARNET_dataset_temp2[['FID', 'IID','AGE', 'race', 'HISTORY_DIABETES', 'MEAN_BMI', 'MEAN_WHR', 'PANCREATITIS', 'PAN_CAN_MONTHS_SURVIVED', 'DECEASED']].copy()
-WHIMS_dataset_covar=WHIMS_dataset_temp2[['FID', 'IID','AGE', 'race', 'HISTORY_DIABETES', 'MEAN_BMI', 'MEAN_WHR', 'PANCREATITIS', 'PAN_CAN_MONTHS_SURVIVED', 'DECEASED']].copy()
-
-#GARNET_dataset_covar=GARNET_dataset_temp2[['FID', 'IID','AGE', 'race', 'HISTORY_DIABETES', 'SPANISH_RACE', 'BLACK', 'MEAN_BMI', 'MEAN_WHR', 'PANCREATITIS', 'AGE_DIAGNOSED', 'PAN_CAN_LOCATION', 'TUMOUR_BEHAVIOUR', 'LATERALITY', 'TUMOUR_MORPHOLOGY', 'TUMOUR_GRADE', 'TUMOUR_SIZE', 'TUMOUR_STAGE', 'PAN_CAN_MONTHS_SURVIVED', 'DECEASED']].copy()
 
 
+## Generate Covariate File ##
+
+# Make a covariate file by extracting the required variables.
+# Copy covariates to the covariate file so that any changes to this dataframe will not affect the original dataframe
+
+GARNET_dataset_covar_temp1 = GARNET_dataset_temp2[['FID', 'IID', 'AGE', 'race', 'HISTORY_DIABETES', 'MEAN_BMI', 'MEAN_WHR', 'PANCREATITIS', 'PAN_CAN_MONTHS_SURVIVED', 'DECEASED']].copy()
+WHIMS_dataset_covar_temp1 = WHIMS_dataset_temp2[['FID', 'IID','AGE', 'race', 'HISTORY_DIABETES', 'MEAN_BMI', 'MEAN_WHR', 'PANCREATITIS', 'PAN_CAN_MONTHS_SURVIVED', 'DECEASED']].copy()
+
+# Make another temp dataset which has the principle components
+
+GARNET_dataset_covar_temp2 = pd.merge(left=GARNET_dataset_covar_temp1, right=phenogeno[['SAMPLE_ID','PC1', 'PC2', 'PC3']], how='left', left_on='IID', right_on='SAMPLE_ID')
+WHIMS_dataset_covar_temp2 = pd.merge(left=WHIMS_dataset_covar_temp1, right=phenogeno[['SAMPLE_ID','PC1', 'PC2', 'PC3']], how='left', left_on='IID', right_on='SAMPLE_ID')
+
+
+# Make the final covariate file with the columns in the order required by PLINK
+
+GARNET_dataset_covar = GARNET_dataset_covar_temp2[['FID', 'IID', 'PC1', 'PC2', 'PC3', 'AGE', 'race', 'HISTORY_DIABETES', 'MEAN_BMI', 'MEAN_WHR', 'PANCREATITIS', 'PAN_CAN_MONTHS_SURVIVED', 'DECEASED']]
+WHIMS_dataset_covar = WHIMS_dataset_covar_temp2[['FID', 'IID', 'PC1', 'PC2', 'PC3', 'AGE', 'race', 'HISTORY_DIABETES', 'MEAN_BMI', 'MEAN_WHR', 'PANCREATITIS', 'PAN_CAN_MONTHS_SURVIVED', 'DECEASED']]
+
+
+
+
+
+
+# For plink compatibility, fill NA with -9
 
 GARNET_dataset_covar = GARNET_dataset_covar.fillna(-9)
-
 WHIMS_dataset_covar = WHIMS_dataset_covar.fillna(-9)
 
 
 
 
 
+
+# Set output directory
+
+
 GARNET_out_dir = "/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/GARNET_dataset"
 
+# Output the files
 
 GARNET_dataset_pheno.to_csv(os.path.join(GARNET_out_dir, "GARNET_dataset_pheno.tsv"), sep='\t', index=False)
 GARNET_dataset_covar.to_csv(os.path.join(GARNET_out_dir, "GARNET_dataset_covar.tsv"), sep='\t', index=False)
@@ -281,10 +300,11 @@ GARNET_dataset_pfam.to_csv(os.path.join(GARNET_out_dir, "GARNET_dataset_allchr.p
 
 
 
-
+# Set output directory
 
 WHIMS_out_dir = "/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/WHIMS_dataset"
 
+# Output the files
 
 WHIMS_dataset_pheno.to_csv(os.path.join(WHIMS_out_dir, "WHIMS_dataset_pheno.tsv"), sep='\t', index=False)
 WHIMS_dataset_covar.to_csv(os.path.join(WHIMS_out_dir, "WHIMS_dataset_covar.tsv"), sep='\t', index=False)

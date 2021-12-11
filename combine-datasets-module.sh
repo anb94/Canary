@@ -156,9 +156,10 @@ recursive_comm  "${out_dir}"/*_snp-set.tsv > "${out_dir}"/"${output_name}"_share
 # Generate map file for the combined dataset #
 # The below code generating the map files is based on the code above
 for i in "${datasets[@]}"; do
-  echo "Generating map file for "${dtst}" in directory "${i}""
+
   #take name of folder as the name for each individual dataset
   dtst=$(basename "$i")
+    echo "Generating map file for "${dtst}" in directory "${i}""
   # remove the first line as it contains header
   tail -n +2  "${i}"/*_allchr.pdat | gawk '{print 0,$1,0,0}' > "${i}"/"${dtst}".map
   echo "Finished generating map file for "${dtst}""
