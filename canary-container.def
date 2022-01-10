@@ -1,11 +1,13 @@
 Bootstrap: docker
-From: ubuntu:18.04
+From: ubuntu:20.04
 
 %post
   # Update the package manager
     apt-get update
     apt-get upgrade -y
   # Install necessary packages
+    DEBIAN_FRONTEND=noninteractive
+    apt-get -y install tzdata
     apt install -y python3 python3-pip build-essential software-properties-common wget ubuntu-drivers-common tar bzip2 curl sed plink zip zlib1g-dev gawk
     apt-get update
     apt-get upgrade -y
@@ -42,7 +44,7 @@ From: ubuntu:18.04
     mkdir plink1
     cd plink1
     #download plink1.9
-    wget -O plink.zip https://s3.amazonaws.com/plink1-assets/plink_linux_x86_64_20210416.zip
+    wget -O plink.zip https://s3.amazonaws.com/plink1-assets/plink_linux_x86_64_latest.zip
     #unzip
     unzip plink.zip
     #remove plink.zip
@@ -55,8 +57,7 @@ From: ubuntu:18.04
     mkdir plink2
     cd plink2
     ## Download plink2
-    #wget -O plink2.zip https://s3.amazonaws.com/plink2-assets/alpha2/plink2_linux_x86_64.zip
-    wget -O plink2.zip https://s3.amazonaws.com/plink2-assets/plink2_linux_x86_64_20211011.zip
+    wget -O plink2.zip https://s3.amazonaws.com/plink2-assets/plink2_linux_x86_64_latest.zip
     ## unzip the file
     unzip plink2.zip
     ## remove the zip file
@@ -64,21 +65,20 @@ From: ubuntu:18.04
 
   # Download and install dose2plink
 	  cd /
-    curl -O https://raw.githubusercontent.com/anb94/plink-ng/master/1.9/dose2plink.c
+    curl -O https://raw.githubusercontent.com/anb94/plink-ng/master/1.9/dose2plink.c || curl -O https://cdn.jsdelivr.net/gh/anb94/plink-ng@master/1.9/dose2plink.c
     gcc /dose2plink.c -lz -o /dose2plink
     mkdir dosetoplink
     mv /dose2plink /dosetoplink
 
 
 
-
   # Install R and R packages
-
+  
     ln -fs /usr/share/zoneinfo/Europe/London /etc/localtime
     apt-get install -y default-jre openjdk-11-jre-headless openjdk-8-jre-headless default-jdk libcurl4 libcurl4-openssl-dev libxml2-dev libssl-dev
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
-    add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/"
-    add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ bionic-backports main restricted universe"
+    add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/"
+    add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-backports main restricted universe multiverse"
     apt-get update
     apt-get upgrade -y
     apt-get install -y r-base r-base-dev
