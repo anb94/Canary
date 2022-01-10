@@ -64,7 +64,7 @@ From: ubuntu:20.04
     rm -rf plink2.zip
 
   # Download and install dose2plink
-	  cd /
+    cd /
     curl -O https://raw.githubusercontent.com/anb94/plink-ng/master/1.9/dose2plink.c || curl -O https://cdn.jsdelivr.net/gh/anb94/plink-ng@master/1.9/dose2plink.c
     gcc /dose2plink.c -lz -o /dose2plink
     mkdir dosetoplink
