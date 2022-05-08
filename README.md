@@ -21,3 +21,22 @@ Once inside the container, run the script you desire to use. For example, starti
 
 ~/Canary/combine-datasets-module.sh -d ~/dbgap/WHI/SHARE_dataset -d ~/dbgap/WHI/SHARE_dataset -n whicombtest -o ~/processed_data/dbgap/WHI/combined_SHARE
 
+
+## Software Installed
+
+Canary comes with other software essential for performing GWAS:
+
+- PLINK1 and PLINK2
+- BCFTools
+- SRAToolkit
+- GCTA
+- Python3: 
+    - Pandas
+    - NumPy
+- R:
+    - GWASTools (Biocondutor)
+    - Tidyverse
+
+
+
+
