@@ -45,3 +45,4 @@ Canary comes with other software essential for performing GWAS:
 
 
 
+Logo adapted from <a href="https://www.vecteezy.com/free-vector/nature">Nature Vectors by Vecteezy</a> 
