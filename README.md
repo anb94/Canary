@@ -1,4 +1,7 @@
-![alt text] (https://github.com/anb94/Canary/blob/97247ab0bd8439e9d6f4d9ee6265c56536270bcd/canarylogo.png)
+<p align="center">
+    <img src="https://github.com/anb94/Canary/blob/97247ab0bd8439e9d6f4d9ee6265c56536270bcd/canarylogo.png">
+</p>
+
 
 # Canary
 
