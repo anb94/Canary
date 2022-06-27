@@ -50,6 +50,14 @@ The Canary container comes with software essential for performing GWAS analyses 
     - Tidyverse
 
 
+## Phenotype File Preparation
+
+It is recommended to begin with preparing the phenotype files for your analysis first as these are required when preparing the genotype files.
+A tutorial for preparing the phenotype file is provided in the script "Tutorial-for-Phenotype-File.py"
+
+
+## Genotype File Preparation
+
 
 
 
