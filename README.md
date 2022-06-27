@@ -1,3 +1,5 @@
+![alt text] (https://github.com/anb94/Canary/blob/97247ab0bd8439e9d6f4d9ee6265c56536270bcd/canarylogo.png)
+
 # Canary
 
 A tool for automatic conversion of MaCH dosage files into PLINK compatible files.
