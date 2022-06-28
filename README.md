@@ -132,14 +132,57 @@ singularity shell ~/Canary/Canary.sif
 
 Once inside the container (step 4), you can run the script you desire to use. 
 
-For example, if you wish to combine the consent groups, you would type the following command:
 
+### Module 1: Convert MaCH Example
+
+The convert-mac-module.sh allows conversion of mlinfo and mldose MaCH files into PLINK compatible files.
+
+```bash
+-c    Directories containing consent data, pass once per directory.
+-n    dataset output naming prefix for the files.
+-o    Output directory of the converted files.
+-h    Print help.
+ ```
+
+Example:
+ ```bash
+ ~/Canary/convert-mac-module.sh -c ~/dbgap/WHI/SHARE_dataset/consentgroup1 -c ~/dbgap/WHI/SHARE_dataset/consentgroup2 -n SHARE -o ~/dbgap/WHI/SHARE_dataset
+ ```
+    
+### Module 2: Combine Consent Groups Example
+
+The combine-datasets-module.sh allows the user to combine harmoinzed consent groups of a study.
+
+Command line arguments:
+ ```bash
+-d    Directories of datasets to combine, pass once per directory.
+-o    Output directory.
+-n    dataset output naming prefix.
+-h    Print help.
+ ```
+
+Example:
 
 ```bash
 ~/Canary/combine-datasets-module.sh -d ~/dbgap/WHI/SHARE_dataset -d ~/dbgap/WHI/SHARE_dataset -n WHI-SHARE-CB -o ~/processed_data/dbgap/WHI/SHARE-CB
 ```
 
+### Module 3: Correct PLINK files Example
 
+The correct-plinkfiles.sh module corrects plink files if combine-datasets-module.sh was not used.
+
+
+Command line arguments:
+```bash
+-d    Directories containing the dataset, pass once per directory.
+-n    dataset output naming prefix
+-h    Print help.
+```
+
+Example:
+```bash
+~/Canary/correct-plinkfiles.sh -d ~/dbgap/WHI/SHARE_dataset -d ~/dbgap/WHI/SHARE_dataset -n SHARE -o ~/dbgap/WHI/SHARE_dataset
+```
 
 ###  Canary Logo Credit
 Canary logo was creating using an original image from <a href="https://www.vecteezy.com/free-vector/nature">Nature Vectors by Vecteezy</a>.
