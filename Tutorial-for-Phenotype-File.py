@@ -6,6 +6,10 @@ pd.set_option('display.max_columns', 120)
 
 ##################################################
 
+# This tutorial uses the WHI dataset as an example for generating phenotype files. Users are advised to make a copy of this script rather than edit directly. 
+# Users should replace the file path and file name variables to reflect that of their own system.
+
+
 # Load in the necessary files which will be used for building the phenotype dataset #
 
 
