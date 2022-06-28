@@ -191,7 +191,7 @@ Example:
 ```bash
 ~/Canary/correct-plinkfiles.sh -d ~/dbgap/WHI/SHARE_dataset -d ~/dbgap/WHI/SHARE_dataset -n SHARE -o ~/dbgap/WHI/SHARE_dataset
 ```
-### Final Steps
+#### Final Steps
 
 Once you have followed the above steps, you need to update the sex information in the genotype files. You can perform this step using the phenotype file generated earlier and PLINK's update-sex command.
 
