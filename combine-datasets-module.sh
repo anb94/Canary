@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# manual input
+# This script will combine MaCH and minimac imputed data for consent groups from the same study. For example,
+# it can combine the two consent groups of WHI SHARE data available from dbGaP.
+
 # Path of the *allchr.pdat input files - (should be the dir used in ${dose2plinkout}"/"${dataset}" from convert-mac-module.sh)
 
 ########################################################################
@@ -8,7 +10,7 @@
 Help() {
    # Display help
     printf "
-    This script combines datasets.\n\n"
+    This script combines datasets from the same study. Important: It does NOT harmonize datasetes from different studies.\n\n"
     printf "Usage:\n\n"
     echo "-d    Directories of datasets to combine, pass once per directory."
     echo "-o    Output directory, for outputting data."
