@@ -34,7 +34,7 @@ The Canary container comes with software essential for performing GWAS analyses 
 
 ### System Requirements
 
-In order to use Canary you must have singularity installed on your system. To installm please follow the installation guide at https://docs.sylabs.io/guides/latest/user-guide/quick_start.html#quick-installation-steps.
+In order to use Canary you must have singularity installed on your system. To install, please follow the installation guide at https://docs.sylabs.io/guides/latest/user-guide/quick_start.html#quick-installation-steps.  
 
 
 ## Phenotype File Preparation
