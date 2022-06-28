@@ -61,6 +61,10 @@ An overview of the modules available can be seen in the image below:
 </p>
 
 
+As described in the image above, the typical order of operations would be:
+- convert-mac-module.sh
+- combine-datasets-module.sh (Should be skipped if using single dataset/consent group)
+- correct-plinkfiles.sh (Should be skipped if used combine-datasets-module.sh, as it is automatically performed in this module)
 
 ## User Guide
 
