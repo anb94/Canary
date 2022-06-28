@@ -31,6 +31,7 @@ The Canary container comes with software essential for performing GWAS analyses 
     - GWASTools (Biocondutor)
     - Tidyverse
 
+Users are recommended to familiarise themselves with terms of use of the above software before using.
 
 ## System Requirements
 
@@ -39,6 +40,10 @@ In order to use Canary you must have singularity installed on your system. To in
 Any operating system that has singularity installed can run Canary. This is because Canary utilises container technology and therefore does not need any other software installed on the system as it is installed in the container. The Canary container uses Ubuntu 20.04
 
 However, we do recommend using a Linux environment if possible as it is the most simple and reliable option for installing and using singularity.
+
+Building the container should take approximately 30 minutes and will occupy approximately 1.2GB of space.
+
+Total time from installation of singularity, building the container and moving it to a HPC environment is approximately 1 hour, depending on upload and download speeds. 
 
 ## Phenotype File Preparation
 
@@ -115,6 +120,7 @@ If you wish to use this container on an HPC, you should first copy the Canary fo
 ```bash
 scp -r ~/Canary HPC-username@10.10.0.2:/usr/Canary
 ```
+Note: Spped of the
 
 For help with this step you can read this article https://linuxize.com/post/how-to-use-scp-command-to-securely-transfer-files/.
 
