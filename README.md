@@ -43,7 +43,7 @@ It is recommended that phenotype files are prepared first as these are required 
 
 
 <p align="center">
-    <img height="600"  src="https://github.com/anb94/Canary/blob/34f31779fab82712abb4dd021250f79f92772856/canary-images/phenotype-file.png">
+    <img height="600"  src="https://github.com/anb94/Canary/blob/a7add4d454b231a42804b168490c99c737df4c4e/canary-images/phenotype-file.png">
 </p>
 
 
@@ -128,7 +128,7 @@ singularity shell ~/Canary/Canary.sif
 
 Once inside the container (step 4), you can run the script you desire to use. 
 
-For example, if you are starting at the first step and wish to combine the consent groups, you would type the following command:
+For example, if you wish to combine the consent groups, you would type the following command:
 
 
 ```bash
