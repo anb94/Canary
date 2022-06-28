@@ -118,7 +118,6 @@ For help with this step you can read this article https://linuxize.com/post/how-
 It is important to note that if you plan to use Canary on an HPC, singularity must be installed on the HPC. If your HPC system does not have singularity installed, contact a system administrator and provide them with the guide at https://sylabs.io/guides/latest/admin-guide/.
 
 
-
 ### Step 4: Using the Canary container
 
 Once you have built the container, you can run the container with:
@@ -133,7 +132,7 @@ singularity shell ~/Canary/Canary.sif
 Once inside the container (step 4), you can run the script you desire to use. 
 
 
-### Module 1: Convert MaCH Example
+#### Module 1: Convert MaCH Example
 
 The convert-mac-module.sh allows conversion of mlinfo and mldose MaCH files into PLINK compatible files.
 
@@ -149,7 +148,7 @@ Example:
  ~/Canary/convert-mac-module.sh -c ~/dbgap/WHI/SHARE_dataset/consentgroup1 -c ~/dbgap/WHI/SHARE_dataset/consentgroup2 -n SHARE -o ~/dbgap/WHI/SHARE_dataset
  ```
     
-### Module 2: Combine Consent Groups Example
+#### Module 2: Combine Consent Groups Example
 
 The combine-datasets-module.sh allows the user to combine harmoinzed consent groups of a study.
 
@@ -167,7 +166,7 @@ Example:
 ~/Canary/combine-datasets-module.sh -d ~/dbgap/WHI/SHARE_dataset -d ~/dbgap/WHI/SHARE_dataset -n WHI-SHARE-CB -o ~/processed_data/dbgap/WHI/SHARE-CB
 ```
 
-### Module 3: Correct PLINK files Example
+#### Module 3: Correct PLINK files Example
 
 The correct-plinkfiles.sh module corrects plink files if combine-datasets-module.sh was not used.
 
