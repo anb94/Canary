@@ -1,14 +1,13 @@
 #!/bin/bash
 
-#### THIS SCRIPT NEEDS A DOC STRING HERE TO EXPLAIN WHAT IT DOES
-# This script will combine MaCH and minimac imputed data for consent groups from the same study. For example,
-# it can combine the two consent groups of WHI SHARE data available from dbGaP.
+#### 
+# This script converts MaCH and minimac mlinfo and mldose imputed data into PLINK compatible files.
 
 Help()
 {
    # Display help
     printf "
-    This script combines MaCH and minimac imputed data for consent groups from the same study.\n\n"
+    This script converts MaCH and minimac mlinfo and mldose imputed data into PLINK compatible files.\n\n"
     printf "Usage:\n\n"
     echo "-c    Directories containing consent data, pass once per directory."
     echo "-n    dataset output naming prefix, for naming things."
