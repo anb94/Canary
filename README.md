@@ -8,16 +8,63 @@
 
 ## Introduction
 
-Canary is a bioinformatics tool that allows for the automatic conversion of MaCH dosage files (mlinfo and mldose) into PLINK1 and PLINK2 compatible files. 
+Canary is a bioinformatics tool that allows for the automatic conversion of MaCH dosage files (mlinfo and mldose) into PLINK1 and PLINK2 compatible files. It also has other software that is essential for performing GWAS installed.
 
 
 This repository provides a guide for using Canary for semi-automated preparation of both genotype and phenotype files for GWAS analyses using MaCH dosage  files, mlinfo and mldose format, such as those provided by dbGaP for the Women's Health Initiative (WHI).
 
 
 
-## How To Use
+### Software Installed in Canary
 
-Canary is essentially a singularity container that comes preloaded with software and scripts that allows users to convert file format and perform GWAS more easily on a local machine and/or HPC environment. To install, please folow the steps below. 
+The Canary container comes with software essential for performing GWAS analyses installed, including:
+
+- PLINK1
+- PLINK2
+- BCFTools
+- SRAToolkit
+- GCTA
+- Python3: 
+    - Pandas
+    - NumPy
+- R:
+    - GWASTools (Biocondutor)
+    - Tidyverse
+
+
+### System Requirements
+
+In order to use Canary you must have singularity installed on your system. To installm please follow the installation guide at https://docs.sylabs.io/guides/latest/user-guide/quick_start.html#quick-installation-steps.
+
+
+## Phenotype File Preparation
+
+It is recommended that phenotype files are prepared first as these are required when preparing the genotype files. An overview of the phenotype file generation process can be seen in the image below:
+
+
+<p align="center">
+    <img height="600"  src="https://github.com/anb94/Canary/blob/34f31779fab82712abb4dd021250f79f92772856/canary-images/phenotype-file.png">
+</p>
+
+
+Automated preparation of the phenotype file is not supported by Canary. However, we do provide a detailed tutorial for preparing the phenotype file using Python3 in the script "Tutorial-for-Phenotype-File.py". Users are advised to edit a copy this file rather than edit it directly.
+
+
+## Genotype File Preparation
+
+The main function of Canary is to convert mldose and mlinfo MaCH files into PLINK compatible files. This can be achieved using the scripts provided whilst using the Canary environment.
+
+An overview of the modules available can be seen in the image below:
+
+<p align="center">
+    <img height="400"  src="https://github.com/anb94/Canary/blob/34f31779fab82712abb4dd021250f79f92772856/canary-images/canary-overview.png">
+</p>
+
+
+
+## User Guide
+
+Canary is a singularity container that comes preloaded with software and scripts that allows users to convert file formats and perform GWAS more easily on a local machine and/or HPC environment. To install and use Canary, please folow the steps below. 
 
 
 ### Step 1: Install singularity
@@ -87,33 +134,6 @@ For example, if you are starting at the first step and wish to combine the conse
 ```bash
 ~/Canary/combine-datasets-module.sh -d ~/dbgap/WHI/SHARE_dataset -d ~/dbgap/WHI/SHARE_dataset -n WHI-SHARE-CB -o ~/processed_data/dbgap/WHI/SHARE-CB
 ```
-
-
-
-## Software Installed in Canary
-
-The Canary container comes with software essential for performing GWAS analyses installed, including:
-
-- PLINK1 and PLINK2
-- BCFTools
-- SRAToolkit
-- GCTA
-- Python3: 
-    - Pandas
-    - NumPy
-- R:
-    - GWASTools (Biocondutor)
-    - Tidyverse
-
-
-## Phenotype File Preparation
-
-It is recommended to begin with preparing the phenotype files for your analysis first as these are required when preparing the genotype files.
-A tutorial for preparing the phenotype file is provided in the script "Tutorial-for-Phenotype-File.py"
-
-
-## Genotype File Preparation
-
 
 
 
