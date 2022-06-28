@@ -32,12 +32,13 @@ The Canary container comes with software essential for performing GWAS analyses 
     - Tidyverse
 
 
-### System Requirements
+## System Requirements
 
 In order to use Canary you must have singularity installed on your system. To install, please follow the installation guide at https://docs.sylabs.io/guides/latest/user-guide/quick_start.html#quick-installation-steps.  
 
 Any operating system that has singularity installed can run Canary. This is because Canary utilises container technology and therefore does not need any other software installed on the system as it is installed in the container. The Canary container uses Ubuntu 20.04
 
+However, we do recommend using a Linux environment if possible as it is the most simple and reliable option for installing and using singularity.
 
 ## Phenotype File Preparation
 
