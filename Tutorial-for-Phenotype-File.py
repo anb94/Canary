@@ -14,8 +14,8 @@ pd.set_option('display.max_columns', 120)
 # First, we will define the directories which contain the phenotype files as c1_pheno_data_dir and c2_pheno_data_dir, where the 'c' in c1 and c2 represents consent group.
 # Therefore, you can add additional lines if there is more than 2 consent groups (or delete the second consent group) depending on your study.
 
-c1_pheno_data_dir = "/home/anbennett2/scratch/datasets/raw_data/dbgap_data/WHI/pheno/c1/PhenotypeFiles"
-c2_pheno_data_dir = "/home/anbennett2/scratch/datasets/raw_data/dbgap_data/WHI/pheno/c2/PhenotypeFiles"
+c1_pheno_data_dir = "/usr/path/to/files/consentgroup1"
+c2_pheno_data_dir = "/usr/path/to/files/consentgroup2"
 
 
 # In the step above, we defined the directories which contain the phenotype files as c1_pheno_data_dir etc.
@@ -289,8 +289,9 @@ WHIMS_dataset_covar = WHIMS_dataset_covar.fillna(-9)
 
 # Set output directory
 
+# replace accordingly
 
-GARNET_out_dir = "/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/GARNET_dataset"
+GARNET_out_dir = "/usr/path/to/files/GARNET_dataset"
 
 # Output the files
 
@@ -302,7 +303,9 @@ GARNET_dataset_pfam.to_csv(os.path.join(GARNET_out_dir, "GARNET_dataset_allchr.p
 
 # Set output directory
 
-WHIMS_out_dir = "/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/WHIMS_dataset"
+# replace accordingly
+
+WHIMS_out_dir = "/usr/path/to/files/WHIMS_dataset"
 
 # Output the files
 
