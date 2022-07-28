@@ -8,7 +8,7 @@
 
 ## Introduction
 
-Canary is a bioinformatics tool that allows for the automatic conversion of MaCH dosage files (mlinfo and mldose) into PLINK1 and PLINK2 compatible files. It also has other software that is essential for performing GWAS installed.
+Canary is a bioinformatics tool published in BMC Bioinformatics (https://rdcu.be/cSwXP) that allows for the automatic conversion of MaCH dosage files (mlinfo and mldose) into PLINK1 and PLINK2 compatible files. It also has other software that is essential for performing GWAS installed.
 
 
 This repository provides a guide for using Canary for semi-automated preparation of both genotype and phenotype files for GWAS analyses using MaCH dosage  files, mlinfo and mldose format, such as those provided by dbGaP for the Women's Health Initiative (WHI).
