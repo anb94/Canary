@@ -1,12 +1,7 @@
 #!/bin/bash
 
-dataset_dir=/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/WHIMS_dataset
-dataset=WHIMS
-
-
 ########################################################################
 
-# JETHRO CREATE INPUT HERE
 
 Help()
 {
