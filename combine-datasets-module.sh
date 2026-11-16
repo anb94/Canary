@@ -1,4 +1,6 @@
 #!/bin/bash
+# Exit on the first failed command, including a failure in the middle of a pipeline.
+set -eo pipefail
 
 # This script will combine MaCH and minimac imputed data for consent groups from the same study. For example,
 # it can combine the two consent groups of WHI SHARE data available from dbGaP.
@@ -10,11 +12,18 @@
 Help() {
    # Display help
     printf "
-    This script combines datasets from the same study. Important: It does NOT harmonize datasetes from different studies.\n\n"
+    Merge two or more converted datasets from the same study into one PLINK 1 fileset.\n"
+    printf "    This does not harmonize datasets from different studies. One dataset is not\n"
+    printf "    enough: use correct-plinkfiles.sh for that. The script stops at the first\n"
+    printf "    failed command.\n\n"
     printf "Usage:\n\n"
-    echo "-d    Directories of datasets to combine, pass once per directory."
-    echo "-o    Output directory, for outputting data."
-    echo "-n    dataset output naming prefix, for naming things."
+    echo "combine-datasets-module.sh -d DIR -d DIR [-d DIR ...] -n PREFIX -o OUTDIR"
+    echo ""
+    echo "-d    Directory produced by convert-mac-module.sh. Pass once per dataset."
+    echo "      The folder name is the file prefix. A folder named SHARE must contain"
+    echo "      SHARE_allchr.pdat, SHARE_allchr.pfam, SHARE_pheno.tsv, and SHARE_covar.tsv."
+    echo "-o    Output directory for the merged PLINK 1 files."
+    echo "-n    Prefix for the merged output."
     echo "-h    Print this help."
     echo ""
 }
@@ -123,8 +132,8 @@ for i in "${datasets[@]}"; do
   #take name of folder as the name for each individual dataset
   dtst=$(basename "$i")
   # remove the first line as it contains header
-  tail -n +2  "${i}"/*_allchr.pdat | gawk '{print $1,$2,$3}' | sort > "${out_dir}"/"${dtst}"_snp-set.tsv
-  tail -n +2  "${i}"/*_allchr.pdat | gawk '{print $1,$2,$3}' | sort > "${i}"/"${dtst}"_snp-set.tsv
+  tail -n +2  "${i}"/"${dtst}"_allchr.pdat | gawk '{print $1,$2,$3}' | sort > "${out_dir}"/"${dtst}"_snp-set.tsv
+  tail -n +2  "${i}"/"${dtst}"_allchr.pdat | gawk '{print $1,$2,$3}' | sort > "${i}"/"${dtst}"_snp-set.tsv
 
   echo "Finished generating SNP set for "${i}""
 done
@@ -163,7 +172,7 @@ for i in "${datasets[@]}"; do
   dtst=$(basename "$i")
     echo "Generating map file for "${dtst}" in directory "${i}""
   # remove the first line as it contains header
-  tail -n +2  "${i}"/*_allchr.pdat | gawk '{print 0,$1,0,0}' > "${i}"/"${dtst}".map
+  tail -n +2  "${i}"/"${dtst}"_allchr.pdat | gawk '{print 0,$1,0,0}' > "${i}"/"${dtst}".map
   echo "Finished generating map file for "${dtst}""
 done
 echo "Completed Generating map files for datasets"
@@ -187,7 +196,7 @@ for i in "${datasets[@]}"; do
   echo "importing "${i}" into plink2 format"
   #take name of folder as the name for each individual dataset
   dtst=$(basename "$i")
-  plink2 --import-dosage "${i}"/*_allchr.pdat \
+  plink2 --import-dosage "${i}"/"${dtst}"_allchr.pdat \
   --psam "${i}"/"${dtst}"_allchr.pfam \
   --map "${i}"/"${dtst}".map \
   --extract "${out_dir}"/"${output_name}"_sharedsnps.tsv \

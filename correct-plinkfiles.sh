@@ -1,4 +1,6 @@
 #!/bin/bash
+# Exit on the first failed command, including a failure in the middle of a pipeline.
+set -eo pipefail
 
 ########################################################################
 
@@ -7,10 +9,17 @@ Help()
 {
    # Display help
     printf "
-    This script imports one converted MaCH dataset into PLINK and corrects chromosome and position in the PLINK1 files.\n\n"
+    Import one converted dataset into PLINK and fill in chromosome and position\n"
+    printf "    on the PLINK 1 files. Use this when there is a single dataset.\n"
+    printf "    Skip it after combine-datasets-module.sh, which does this itself.\n"
+    printf "    The script stops at the first failed command.\n\n"
     printf "Usage:\n\n"
-    echo "-d    Directory containing the converted dataset."
-    echo "-n    dataset output naming prefix, the same prefix passed to convert-mac-module.sh."
+    echo "correct-plinkfiles.sh -d OUTDIR -n PREFIX"
+    echo ""
+    echo "-d    Directory that contains the convert-mac-module.sh output."
+    echo "-n    Same prefix passed to convert-mac-module.sh. That directory must contain"
+    echo "      PREFIX_allchr.pdat, PREFIX_allchr.pfam, PREFIX_all_chr_lq_all_snps.txt,"
+    echo "      PREFIX_pheno.tsv, and PREFIX_covar.tsv."
     echo "-h    Print this help."
     echo ""
 }

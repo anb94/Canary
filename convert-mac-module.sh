@@ -1,4 +1,6 @@
 #!/bin/bash
+# Exit on the first failed command, including a failure in the middle of a pipeline.
+set -eo pipefail
 
 #### 
 # This script converts MaCH and minimac mlinfo and mldose imputed data into PLINK compatible files.
@@ -7,12 +9,22 @@ Help()
 {
    # Display help
     printf "
-    This script converts MaCH and minimac mlinfo and mldose imputed data into PLINK compatible files.\n\n"
+    Concatenate MaCH/minimac .dose files across consent groups and convert them\n"
+    printf "    to PLINK dosage files (.pdat and .pfam). This script does not run PLINK.\n\n"
     printf "Usage:\n\n"
-    echo "-c    Directories containing consent data, pass once per directory."
-    echo "-n    dataset output naming prefix, for naming things."
-    echo "-o    Output directory, for outputting data."
+    echo "convert-mac-module.sh -c DIR [-c DIR ...] -n PREFIX -o OUTDIR"
+    echo ""
+    echo "-c    Consent-group directory. Pass once per directory."
+    echo "      Expected names look like SHAREchr1aa.dose.c1 and SHAREchr1aa.info."
+    echo "      A letter must follow the chromosome number so chromosome 1 does not"
+    echo "      also match chromosomes 10-19. aa is African American, ha is Hispanic American."
+    echo "-n    Prefix for the output files, for example SHARE. Writes SHARE_chrN.dose,"
+    echo "      SHARE_allchr.pdat, and SHARE_allchr.pfam in the output directory."
+    echo "-o    Output directory. A trailing slash is removed."
     echo "-h    Print this help."
+    echo ""
+    echo "The script stops at the first failed command. A re-run clears PREFIX_chr1.dose"
+    echo "through PREFIX_chr22.dose before concatenating the consent groups again."
     echo ""
 }
 
@@ -49,15 +61,12 @@ then
 fi
 
 # check all args given
-for arg in "$consent_groups" "$dataset" "$out_dir"
-do
-    if [ -n "${!arg}" ]
-    then
-        printf "Error: Missing argument(s). See usage below."
-        Help
-        exit 1
-    fi
-done
+if [ ${#consent_groups[@]} -eq 0 ] || [ -z "${dataset}" ] || [ -z "${out_dir}" ]
+then
+    printf "Error: Missing argument(s). See usage below."
+    Help
+    exit 1
+fi
 
 # sense check given consent directories exist, can also check for correct data etc.
 for dir in "${consent_groups[@]}"
@@ -88,7 +97,7 @@ printf "\nOutput directory: $out_dir\n"
 if [[ "${out_dir: -1}" == "/" ]]
 then
 	# check for trailing slash and remove
-	$out_dir="${outidr%?}"
+	out_dir="${out_dir%/}"
 fi
 
 d2p="${out_dir}"/"${dataset}"_d2p
@@ -108,10 +117,18 @@ printf "\nUsing output directory: $d2p"
 # Concatenate consent groups
 
 
+# Clear this run's chromosome dose files first. >> below still appends each
+# consent group onto the same chromosome; a re-run must not append onto the last run.
+for ((j=1; j<=22; j++)); do
+  rm -f "${out_dir}"/"${dataset}"_chr"${j}".dose
+done
+
 # Concatenate consent groups
 for i in "${consent_groups[@]}"; do
   for ((j=1; j<=22; j++)); do
     echo "Concatenating ${dataset} consent group ${i} for chromosome ${j}"
+    # [a-z] requires a letter immediately after the chromosome number.
+    # SHAREchr1aa.dose.c1 matches chromosome 1. SHAREchr10aa.dose.c1 does not.
     cat "${i}"/*chr"${j}"[a-z]*.dose* >> "${out_dir}"/"${dataset}"_chr"${j}".dose
   done
 done
@@ -150,6 +167,7 @@ echo "Completed Concatenating ${dataset} Consent Groups"
 # As all info files in the study should be identical, copy info files from only one consent group
 for ((i=1; i<=22; i++)); do
   echo "Copying ${dataset} info file for for chromosome ${i}"
+  # Same chromosome pattern as the .dose files above.
   cp "${consent_groups[0]}"/*chr"${i}"[a-z]*.info* "${out_dir}"/"${dataset}"_chr"${i}".info
 done
 
@@ -189,12 +207,14 @@ echo "Completed Generating low quality SNPs"
 # The low quality SNPs files for each chromosome need to be combined into a single file.
 
 # Append the low qual 0.3 snp files to a combined file
+rm -f "${out_dir}"/"${dataset}"_all_chr_lq03_snps.txt
 for ((i=1; i<=22; i++)); do
   echo "Collecting low quality (cut-off 0.03) for "${dataset}" chrosome ${i}"
   cat "${out_dir}"/"${dataset}"_chr"${i}"_lq03_snps.txt >> "${out_dir}"/"${dataset}"_all_chr_lq03_snps.txt
 done
 
 # Append the low qual 0.8 snp files to a combined file
+rm -f "${out_dir}"/"${dataset}"_all_chr_lq08_snps.txt
 for ((i=1; i<=22; i++)); do
   echo "Collecting low quality (cut-off 0.08) for "${dataset}" chrosome ${i}"
   cat "${out_dir}"/"${dataset}"_chr"${i}"_lq08_snps.txt >> "${out_dir}"/"${dataset}"_all_chr_lq08_snps.txt

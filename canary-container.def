@@ -32,9 +32,11 @@ From: ubuntu:20.04
     mkdir gcta
     cd gcta
     # Download the file
-    wget https://cnsgenomics.com/software/gcta/bin/gcta_1.93.2beta.zip
+    # The lab site returns a bot page to wget's default user agent.
+    wget --user-agent="Mozilla/5.0" --referer="https://yanglab.westlake.edu.cn/software/gcta/" https://yanglab.westlake.edu.cn/software/gcta/bin/gcta_1.93.2beta.zip
     # Unzip the file
     unzip gcta_1.93.2beta.zip
+    ln -sfn /gcta/gcta_1.93.2beta/gcta64 /gcta/gcta
     # Remove zip file
     rm -rf gcta_1.93.2beta.zip
 
@@ -75,15 +77,17 @@ From: ubuntu:20.04
   # Install R and R packages
   
     ln -fs /usr/share/zoneinfo/Europe/London /etc/localtime
-    apt-get install -y default-jre openjdk-11-jre-headless openjdk-8-jre-headless default-jdk libcurl4 libcurl4-openssl-dev libxml2-dev libssl-dev
+    # cmake, fontconfig, harfbuzz, fribidi, and libuv are required to compile tidyverse.
+    # bzip2 and lzma are required by the GWASTools dependency stack.
+    apt-get install -y default-jre openjdk-11-jre-headless openjdk-8-jre-headless default-jdk libcurl4 libcurl4-openssl-dev libxml2-dev libssl-dev cmake pkg-config libfontconfig1-dev libfreetype6-dev libharfbuzz-dev libfribidi-dev libpng-dev libtiff5-dev libjpeg-dev libwebp-dev libcairo2-dev libuv1-dev libbz2-dev liblzma-dev libgit2-dev
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
     add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/"
     add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-backports main restricted universe multiverse"
     apt-get update
     apt-get upgrade -y
     apt-get install -y r-base r-base-dev
-    R -e "install.packages('BiocManager'); library('BiocManager'); BiocManager::install('GWASTools')"
-    R -e 'install.packages(c("tidyverse","qqman"), lib="/usr/local/lib/R/site-library")'
+    R --vanilla -e 'install.packages("BiocManager", repos="https://cloud.r-project.org"); BiocManager::install("GWASTools", ask=FALSE, update=FALSE); if (!requireNamespace("GWASTools", quietly=TRUE)) quit(status=1)'
+    R --vanilla -e 'install.packages(c("tidyverse","qqman"), lib="/usr/local/lib/R/site-library", repos="https://cloud.r-project.org", Ncpus=4); if (!requireNamespace("tidyverse", quietly=TRUE) || !requireNamespace("qqman", quietly=TRUE)) quit(status=1)'
 
 %environment
     export LC_ALL=C

@@ -1,5 +1,6 @@
 #!/bin/bash
-
+# Exit on the first failed command, including a failure in the middle of a pipeline.
+set -eo pipefail
 
 ########################################################################
 
@@ -7,11 +8,17 @@ Help()
 {
    # Display help
     printf "
-    This script imports one converted MaCH dataset into PLINK and corrects chromosome and position in the PLINK1 files.\n\n"
+    Import one or more converted datasets into PLINK and fill in chromosome and\n"
+    printf "    position on the PLINK 1 files. Datasets are not merged, and there is no\n"
+    printf "    shared-SNP list. The script stops at the first failed command.\n\n"
     printf "Usage:\n\n"
-    echo "-d    Directories containing the dataset, pass once per directory."
-    echo "-o    Output directory, for outputting data."
-    echo "-n    dataset output naming prefix, for naming things."
+    echo "single-dataset-correct-plinkfiles.sh -d DIR [-d DIR ...] -n PREFIX -o OUTDIR"
+    echo ""
+    echo "-d    Dataset directory. Pass once per directory. Files are named from the"
+    echo "      folder name, not from -n. A folder named SHARE must contain"
+    echo "      SHARE_allchr.pdat, SHARE_allchr.pfam, SHARE_pheno.tsv, and SHARE_covar.tsv."
+    echo "-o    Directory for the low-quality SNP list copied from the dataset directories."
+    echo "-n    Prefix for that low-quality SNP list."
     echo "-h    Print this help."
     echo ""
 }
@@ -98,7 +105,7 @@ sort "${out_dir}"/"${output_name}"_tempsnps.txt | uniq -u > "${out_dir}"/"${outp
 for i in "${datasets[@]}"; do
   dtst=$(basename "$i")
   echo "Generating map file for "${dtst}" in directory "${i}""
-  tail -n +2 "${i}"/*_allchr.pdat | gawk '{print 0,$1,0,0}' > "${i}"/"${dtst}".map
+  tail -n +2 "${i}"/"${dtst}"_allchr.pdat | gawk '{print 0,$1,0,0}' > "${i}"/"${dtst}".map
   echo "Finished generating map file for "${dtst}""
 done
 
@@ -107,7 +114,7 @@ for i in "${datasets[@]}"; do
   echo "importing "${i}" into plink2 format"
   #take name of folder as the name for each individual dataset
   dtst=$(basename "$i")
-  plink2 --import-dosage "${i}"/*_allchr.pdat \
+  plink2 --import-dosage "${i}"/"${dtst}"_allchr.pdat \
   --psam "${i}"/"${dtst}"_allchr.pfam \
   --map "${i}"/"${dtst}".map \
   --exclude "${i}"/*_lq_all_snps.txt \
