@@ -2,17 +2,13 @@
     <img src="https://github.com/anb94/Canary/blob/97247ab0bd8439e9d6f4d9ee6265c56536270bcd/canarylogo.png">
 </p>
 
-
 # Canary
-
 
 ## Introduction
 
-Canary is a bioinformatics tool published in BMC Bioinformatics (https://rdcu.be/cSwXP) that converts MaCH and minimac dosage files (`.dose` and `.info`) into PLINK files. The container also includes software commonly used for GWAS.
+Canary is a bioinformatics tool published in BMC Bioinformatics (<https://link.springer.com/article/10.1186/s12859-022-04822-8>) that converts MaCH and minimac dosage files (`.dose` and `.info`) into PLINK files. The container also includes software commonly used for GWAS.
 
 This repository is the guide for that conversion, using MaCH files such as those provided by dbGaP for the Women's Health Initiative (WHI). Phenotype files are prepared separately. A Python tutorial is included. The conversion scripts do not build the phenotype file.
-
-
 
 ### Software Installed in Canary
 
@@ -30,7 +26,7 @@ Users are recommended to familiarise themselves with terms of use of the above s
 
 ## System Requirements
 
-In order to use Canary you must have singularity installed on your system. To install, please follow the installation guide at https://docs.sylabs.io/guides/latest/user-guide/quick_start.html#quick-installation-steps.  
+In order to use Canary you must have singularity installed on your system. To install, please follow the installation guide at <https://docs.sylabs.io/guides/latest/user-guide/quick_start.html#quick-installation-steps>.  
 
 Any operating system that has singularity installed can run Canary. This is because Canary utilises container technology and therefore does not need any other software installed on the system as it is installed in the container. The Canary container uses Ubuntu 20.04
 
@@ -38,22 +34,19 @@ A Linux machine is the most straightforward place to install Singularity and bui
 
 Building the container should take approximately 30 minutes and will occupy approximately 1.2GB of space.
 
-Total time from installation of singularity, building the container and moving it to a HPC environment is approximately 1 hour, depending on upload and download speeds. 
+Total time from installation of singularity, building the container and moving it to a HPC environment is approximately 1 hour, depending on upload and download speeds.
 
 ## Phenotype File Preparation
 
 `convert-mac-module.sh` does not read the phenotype file. `correct-plinkfiles.sh` and `combine-datasets-module.sh` do, so prepare the phenotype and covariate files before those two scripts. An overview of the phenotype file generation process can be seen in the image below:
 
-
 <p align="center">
     <img height="600"  src="https://github.com/anb94/Canary/blob/a7add4d454b231a42804b168490c99c737df4c4e/canary-images/phenotype-file.png">
 </p>
 
-
 Automated preparation of the phenotype file is not part of Canary. `Tutorial-for-Phenotype-File.py` is a WHI walkthrough. Copy it and edit the copy.
 
 The import scripts look for a phenotype file and a covariate file beside the genotype files. For a prefix or folder named `SHARE`, those names are `SHARE_pheno.tsv` and `SHARE_covar.tsv`. The tutorial writes names such as `GARNET_dataset_pheno.tsv`. Rename or place the files so they match the script you are about to run.
-
 
 ## Genotype File Preparation
 
@@ -64,7 +57,6 @@ An overview of the modules available can be seen in the image below:
 <p align="center">
     <img height="400"  src="https://github.com/anb94/Canary/blob/34f31779fab82712abb4dd021250f79f92772856/canary-images/canary-overview.png">
 </p>
-
 
 Run the scripts in this order:
 
@@ -79,16 +71,15 @@ Each script stops at the first failed command. Run any script with `-h` to print
 
 ## User Guide
 
-Canary is a Singularity container with the conversion scripts and GWAS tools inside it. To install and use it: 
-
+Canary is a Singularity container with the conversion scripts and GWAS tools inside it. To install and use it:
 
 ### Step 1: Install singularity
 
-In order to use Canary, you must first build it using singularity. Therefore, you must install singularity on your local machine, following the instructions provided at https://docs.sylabs.io/guides/latest/user-guide/quick_start.html#quick-installation-steps before attempting to build the container.
+In order to use Canary, you must first build it using singularity. Therefore, you must install singularity on your local machine, following the instructions provided at <https://docs.sylabs.io/guides/latest/user-guide/quick_start.html#quick-installation-steps> before attempting to build the container.
 
-Once singularity is installed, you can follow the user guide at https://docs.sylabs.io/guides/latest/user-guide/index.html for detailed instructions on how to use singularity.
+Once singularity is installed, you can follow the user guide at <https://docs.sylabs.io/guides/latest/user-guide/index.html> for detailed instructions on how to use singularity.
 
-NOTE: System Administrators can consult the Admin guide for singularity at https://sylabs.io/guides/latest/admin-guide/.
+NOTE: System Administrators can consult the Admin guide for singularity at <https://sylabs.io/guides/latest/admin-guide/>.
 
 ### Step 2: Download Canary github repo
 
@@ -110,11 +101,9 @@ For example:
 sudo singularity build ~/Canary/Canary.sif ~/Canary/canary-container.def
 ```
 
-The first path is where the container image is saved. The second path is `canary-container.def` from this repository. PLINK 1.9 and PLINK 2 are downloaded as the current build at the time you run this command. 
+The first path is where the container image is saved. The second path is `canary-container.def` from this repository. PLINK 1.9 and PLINK 2 are downloaded as the current build at the time you run this command.
 
-
-For help with this step or more detailed instructions on how to use singularity please consult the singularity user guide at https://docs.sylabs.io/guides/latest/user-guide/index.html.
-
+For help with this step or more detailed instructions on how to use singularity please consult the singularity user guide at <https://docs.sylabs.io/guides/latest/user-guide/index.html>.
 
 ### Optional Step: Copying the container to HPC
 
@@ -126,10 +115,9 @@ scp -r ~/Canary HPC-username@10.10.0.2:/usr/Canary
 
 How long this takes depends on the size of the image and the connection.
 
-For help with this step you can read this article https://linuxize.com/post/how-to-use-scp-command-to-securely-transfer-files/.
+For help with this step you can read this article <https://linuxize.com/post/how-to-use-scp-command-to-securely-transfer-files/>.
 
-It is important to note that if you plan to use Canary on an HPC, singularity must be installed on the HPC. If your HPC system does not have singularity installed, contact a system administrator and provide them with the guide at https://sylabs.io/guides/latest/admin-guide/.
-
+It is important to note that if you plan to use Canary on an HPC, singularity must be installed on the HPC. If your HPC system does not have singularity installed, contact a system administrator and provide them with the guide at <https://sylabs.io/guides/latest/admin-guide/>.
 
 ### Step 4: Using the Canary container
 
@@ -147,11 +135,9 @@ singularity shell --no-home ~/Canary/Canary.sif
 
 The conversion scripts do not use R, so they can run from a normal shell.
 
-
 ### Step 5: Using Canary's automated scripts
 
-Once inside the container (step 4), you can run the script you desire to use. 
-
+Once inside the container (step 4), you can run the script you desire to use.
 
 Input dose files are named like `SHAREchr1aa.dose.c1`. The letters after the chromosome number are the ancestry code (`aa` or `ha`). They also stop chromosome 1 from matching chromosomes 10–19. Info files from the first consent group are copied. They are expected to be the same across consent groups.
 
@@ -223,5 +209,6 @@ The corrected PLINK 1 files are `SHARE_plink1_temp1_updated.bed`, `.bim`, and `.
 
 Update sex in the genotype files with PLINK `--update-sex` and the phenotype file from the tutorial. See the PLINK documentation for that command.
 
-###  Canary Logo Credit
+### Canary Logo Credit
+
 Canary logo was created using an original image from <a href="https://www.vecteezy.com/free-vector/nature">Nature Vectors by Vecteezy</a>.
