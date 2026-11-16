@@ -109,11 +109,21 @@ WHIMS_dataset_temp1= pd.merge(left=WHIMS_geno_samples, right=WHI_Sample_filt_746
 
 
 
-# check for duplicates:
+# Keep one row per sample. A missing SAMPLE_ID is not a duplicate of another missing SAMPLE_ID.
 
-GARNET_dataset_temp1.drop_duplicates(subset=['SAMPLE_ID'])
-WHIMS_dataset_temp1.drop_duplicates(subset=['SAMPLE_ID'])
-WHI_Sample_filt_746.drop_duplicates(subset=['SAMPLE_ID'])
+def drop_duplicate_samples(samples):
+    known = samples['SAMPLE_ID'].notna()
+    return pd.concat(
+        [
+            samples.loc[known].drop_duplicates(subset=['SAMPLE_ID']),
+            samples.loc[~known],
+        ],
+        ignore_index=True,
+    )
+
+GARNET_dataset_temp1 = drop_duplicate_samples(GARNET_dataset_temp1)
+WHIMS_dataset_temp1 = drop_duplicate_samples(WHIMS_dataset_temp1)
+WHI_Sample_filt_746 = drop_duplicate_samples(WHI_Sample_filt_746)
 
 #######
 
@@ -126,7 +136,7 @@ pancan_occ = outc_cancer_rel4[outc_cancer_rel4['PANCREAS'] == 1.0].copy()
 pancan_occ.reset_index(inplace=True,drop=True)
 pancan_occ['case'] = 2
 
-pancan_occ.drop_duplicates(subset=['dbGaP_Subject_ID'])
+pancan_occ = pancan_occ.drop_duplicates(subset=['dbGaP_Subject_ID'])
 
 
 
@@ -172,7 +182,7 @@ my_pheno_file = pd.merge(left=my_pheno_file, right=form80_WHRX[['dbGaP_Subject_I
 #can check with :
 my_pheno_file[my_pheno_file['case'] == 2]
 
-my_pheno_file.drop_duplicates(subset=['dbGaP_Subject_ID'])
+my_pheno_file = my_pheno_file.drop_duplicates(subset=['dbGaP_Subject_ID'])
 
 
 
@@ -242,12 +252,17 @@ WHIMS_dataset_temp2[WHIMS_dataset_temp2['case'] == 2]
 
 
 
-GARNET_dataset_pfam = GARNET_dataset_temp2[['FID', 'IID', 'In-Fam-ID-Dad', 'In-Fam-ID-Mum', 'sex', 'case']].copy()
-GARNET_dataset_pfam['case'] = GARNET_dataset_pfam ['case'].fillna(1)
+# A subject with no pancreatic-cancer record is a control (1).
+# A genotype sample that did not match a subject stays missing (-9), rather than becoming a control.
+def controls_for_matched_subjects(dataset):
+    phenotype = dataset[['FID', 'IID', 'In-Fam-ID-Dad', 'In-Fam-ID-Mum', 'sex', 'case']].copy()
+    matched = dataset['dbGaP_Subject_ID'].notna()
+    phenotype.loc[matched, 'case'] = phenotype.loc[matched, 'case'].fillna(1)
+    phenotype['case'] = phenotype['case'].fillna(-9).astype(int)
+    return phenotype
 
-
-WHIMS_dataset_pfam = WHIMS_dataset_temp2[['FID', 'IID', 'In-Fam-ID-Dad', 'In-Fam-ID-Mum', 'sex', 'case']].copy()
-WHIMS_dataset_pfam['case'] = WHIMS_dataset_pfam ['case'].fillna(1)
+GARNET_dataset_pfam = controls_for_matched_subjects(GARNET_dataset_temp2)
+WHIMS_dataset_pfam = controls_for_matched_subjects(WHIMS_dataset_temp2)
 
 
 
