@@ -7,10 +7,10 @@ Help()
 {
    # Display help
     printf "
-    This script combines MaCH and minimac imputed data for consent groups from the same study.\n\n"
+    This script imports one converted MaCH dataset into PLINK and corrects chromosome and position in the PLINK1 files.\n\n"
     printf "Usage:\n\n"
-    echo "-d    Directories containing the dataset, pass once per directory."
-    echo "-n    dataset output naming prefix, for naming things."
+    echo "-d    Directory containing the converted dataset."
+    echo "-n    dataset output naming prefix, the same prefix passed to convert-mac-module.sh."
     echo "-h    Print this help."
     echo ""
 }
@@ -45,20 +45,24 @@ then
 fi
 
 # check all args given
-for arg in "$dataset_dir" "$dataset"
-do
-    if [ -n "${!arg}" ]
-    then
-        printf "Error: Missing argument(s). See usage below."
-        Help
-        exit 1
-    fi
-done
+if [ -z "${dataset_dir}" ] || [ -z "${dataset}" ]
+then
+    printf "Error: Missing argument(s). See usage below."
+    Help
+    exit 1
+fi
+
+if [ ! -d "$dataset_dir" ]
+then
+    printf "\n\" $dataset_dir \" does not seem to be a valid directory, "
+    printf "please check the directory passed with -d\n\n"
+    exit 1
+fi
 
 
 # display a helpful message of inputs
 printf "\nUsing specified arguments:\n"
-printf "\nDataset directories:\n"
+printf "\nDataset directory:\n"
 
 printf "\n $dataset_dir \n"
 
@@ -66,6 +70,27 @@ printf "\n\nName prefix: $dataset\n"
 
 
 ########################################################################
+
+
+# One dataset has no second SNP list to intersect. Build the map from its own .pdat,
+# then import that dosage file. Chromosome and position are filled in afterwards.
+echo "Generating map file for ${dataset}"
+tail -n +2 "${dataset_dir}"/"${dataset}"_allchr.pdat | gawk '{print 0,$1,0,0}' > "${dataset_dir}"/"${dataset}".map
+
+echo "importing ${dataset} into plink2 format"
+plink2 --import-dosage "${dataset_dir}"/"${dataset}"_allchr.pdat \
+  --psam "${dataset_dir}"/"${dataset}"_allchr.pfam \
+  --map "${dataset_dir}"/"${dataset}".map \
+  --exclude "${dataset_dir}"/"${dataset}"_all_chr_lq_all_snps.txt \
+  --pheno "${dataset_dir}"/"${dataset}"_pheno.tsv \
+  --covar "${dataset_dir}"/"${dataset}"_covar.tsv \
+  --make-pgen \
+  --out "${dataset_dir}"/"${dataset}"_plink2_temp1
+
+echo "converting ${dataset} into plink1 format"
+plink2 --pfile "${dataset_dir}"/"${dataset}"_plink2_temp1 \
+  --make-bed \
+  --out "${dataset_dir}"/"${dataset}"_plink1_temp1
 
 
 # Correct bfiles of plink1 files ##

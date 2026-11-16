@@ -7,23 +7,27 @@ Help()
 {
    # Display help
     printf "
-    This script combines MaCH and minimac imputed data for consent groups from the same study.\n\n"
+    This script imports one converted MaCH dataset into PLINK and corrects chromosome and position in the PLINK1 files.\n\n"
     printf "Usage:\n\n"
     echo "-d    Directories containing the dataset, pass once per directory."
+    echo "-o    Output directory, for outputting data."
     echo "-n    dataset output naming prefix, for naming things."
     echo "-h    Print this help."
     echo ""
 }
 
 # input arguments
-while getopts ":d:n:h" option;
+while getopts ":d:o:n:h" option;
 do
    case $option in
         d)
-            dataset_dir="$OPTARG"
+            datasets+=("$OPTARG")
+            ;;
+        o)
+            out_dir="$OPTARG"
             ;;
         n)
-            dataset="$OPTARG"
+            output_name="$OPTARG"
             ;;
         h)
             Help
@@ -45,24 +49,34 @@ then
 fi
 
 # check all args given
-for arg in "$dataset_dir" "$dataset"
+if [ ${#datasets[@]} -eq 0 ] || [ -z "${out_dir}" ] || [ -z "${output_name}" ]
+then
+    printf "Error: Missing argument(s). See usage below."
+    Help
+    exit 1
+fi
+
+# sense check given dataset directories exist
+for dir in "${datasets[@]}"
 do
-    if [ -n "${!arg}" ]
+    if [ ! -d "$dir" ]
     then
-        printf "Error: Missing argument(s). See usage below."
-        Help
+        printf "\n\" $dir \" does not seem to be a valid directory, "
+        printf "please check the directories passed with -d\n\n"
         exit 1
     fi
 done
 
-
 # display a helpful message of inputs
-printf "\nUsing specified arguments:\n"
-printf "\nDataset directories:\n"
+printf "\nUsing directories (-d):\n"
 
-printf "\n $dataset_dir \n"
+for dir in "${datasets[@]}"
+do
+    printf "\n\t $dir"
+done
 
-printf "\n\nName prefix: $dataset\n"
+printf "\n\nOuputting to (-o): ${out_dir}\n"
+printf "\nOutput file prefix (-n): ${output_name}\n\n"
 
 
 ########################################################################
@@ -80,6 +94,15 @@ echo "Finished combining low quality SNPs"
 sort "${out_dir}"/"${output_name}"_tempsnps.txt | uniq -u > "${out_dir}"/"${output_name}"_lq_all_snps.txt
 
 
+# One dataset has no second SNP list to intersect. Build the map from its own .pdat.
+for i in "${datasets[@]}"; do
+  dtst=$(basename "$i")
+  echo "Generating map file for "${dtst}" in directory "${i}""
+  tail -n +2 "${i}"/*_allchr.pdat | gawk '{print 0,$1,0,0}' > "${i}"/"${dtst}".map
+  echo "Finished generating map file for "${dtst}""
+done
+
+
 for i in "${datasets[@]}"; do
   echo "importing "${i}" into plink2 format"
   #take name of folder as the name for each individual dataset
@@ -87,7 +110,6 @@ for i in "${datasets[@]}"; do
   plink2 --import-dosage "${i}"/*_allchr.pdat \
   --psam "${i}"/"${dtst}"_allchr.pfam \
   --map "${i}"/"${dtst}".map \
-  --extract "${out_dir}"/"${output_name}"_sharedsnps.tsv \
   --exclude "${i}"/*_lq_all_snps.txt \
   --pheno "${i}"/"${dtst}"_pheno.tsv \
   --covar "${i}"/"${dtst}"_covar.tsv \
@@ -101,22 +123,25 @@ done
 
 # Correct bfiles of plink1 files ##
 
-#gawk 'BEGIN{FS="\t"; OFS="\t"}{print $3}' "${dataset_dir}"/"${dataset}"_temp2*.bim | gawk 'BEGIN{FS=":";OFS="\t"}{print $1,$2}' > "${dataset_dir}"/"${dataset}"_temp2_chrpos.bim
-gawk 'BEGIN{FS="\t"; OFS="\t"}{print $2}' "${dataset_dir}"/"${dataset}"_plink1_temp1.bim | gawk 'BEGIN{FS=":";OFS="\t"}{print $1,$2}'  > "${dataset_dir}"/"${dataset}"_plink1_temp1_chrpos.bim
+for i in "${datasets[@]}"; do
+  dtst=$(basename "$i")
+  #gawk 'BEGIN{FS="\t"; OFS="\t"}{print $3}' "${i}"/"${dtst}"_temp2*.bim | gawk 'BEGIN{FS=":";OFS="\t"}{print $1,$2}' > "${i}"/"${dtst}"_temp2_chrpos.bim
+  gawk 'BEGIN{FS="\t"; OFS="\t"}{print $2}' "${i}"/"${dtst}"_plink1_temp1.bim | gawk 'BEGIN{FS=":";OFS="\t"}{print $1,$2}'  > "${i}"/"${dtst}"_plink1_temp1_chrpos.bim
 
 
-paste "${dataset_dir}"/"${dataset}"_plink1_temp1*.bim "${dataset_dir}"/"${dataset}"_plink1_temp1_chrpos.bim > "${dataset_dir}"/"${dataset}"_plink1_temp1_w_chrpos.bim
-#paste "${dataset_dir}"/"${dataset}"_temp2.bim "${dataset_dir}"/"${dataset}"_temp2_chrpos.bim > "${dataset_dir}"/"${dataset}"_temp2_w_chrpos.bim
+  paste "${i}"/"${dtst}"_plink1_temp1*.bim "${i}"/"${dtst}"_plink1_temp1_chrpos.bim > "${i}"/"${dtst}"_plink1_temp1_w_chrpos.bim
+  #paste "${i}"/"${dtst}"_temp2.bim "${i}"/"${dtst}"_temp2_chrpos.bim > "${i}"/"${dtst}"_temp2_w_chrpos.bim
 
 
-#gawk 'BEGIN{FS="\t";OFS="\t"}{print $7,$2,$3,$8,$5, $6}'  "${dataset_dir}"/"${dataset}"_temp2_w_chrpos.pvar > "${dataset_dir}"/"${dataset}"_temp2_updated.pvar
-gawk 'BEGIN{FS="\t";OFS="\t"}{print $7,$2,$3,$8,$5, $6}' "${dataset_dir}"/"${dataset}"_plink1_temp1_w_chrpos.bim  > "${dataset_dir}"/"${dataset}"_plink1_temp1_updated.bim
+  #gawk 'BEGIN{FS="\t";OFS="\t"}{print $7,$2,$3,$8,$5, $6}'  "${i}"/"${dtst}"_temp2_w_chrpos.pvar > "${i}"/"${dtst}"_temp2_updated.pvar
+  gawk 'BEGIN{FS="\t";OFS="\t"}{print $7,$2,$3,$8,$5, $6}' "${i}"/"${dtst}"_plink1_temp1_w_chrpos.bim  > "${i}"/"${dtst}"_plink1_temp1_updated.bim
 
 
-echo "Copying other files in the set for plink compatibility..."
-cp "${dataset_dir}"/"${dataset}"_plink1_temp1.bed "${dataset_dir}"/"${dataset}"_plink1_temp1_updated.bed
-cp  "${dataset_dir}"/"${dataset}"_plink1_temp1.fam "${dataset_dir}"/"${dataset}"_plink1_temp1_updated.fam
-echo "Done"
+  echo "Copying other files in the set for plink compatibility..."
+  cp "${i}"/"${dtst}"_plink1_temp1.bed "${i}"/"${dtst}"_plink1_temp1_updated.bed
+  cp  "${i}"/"${dtst}"_plink1_temp1.fam "${i}"/"${dtst}"_plink1_temp1_updated.fam
+  echo "Done"
+done
 
 
 
