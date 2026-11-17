@@ -139,7 +139,7 @@ The conversion scripts do not use R, so they can run from a normal shell.
 
 Once inside the container (step 4), you can run the script you desire to use.
 
-Input dose files are named like `SHAREchr1aa.dose.c1`. The letters after the chromosome number are the ancestry code (`aa` or `ha`). They also stop chromosome 1 from matching chromosomes 10–19. Info files from the first consent group are copied. They are expected to be the same across consent groups.
+Input dose files are named like `SHAREchr1aa.dose.c1`. A letter must come immediately after the chromosome number. Without it, a search for chromosome 1 also matches `chr10` through `chr19`. `aa` is African American and `ha` is Hispanic American. Info files from the first consent group are copied. They are expected to be the same across consent groups.
 
 #### Module 1: Convert MaCH
 
