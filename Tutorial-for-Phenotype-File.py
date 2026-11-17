@@ -6,8 +6,12 @@ pd.set_option('display.max_columns', 120)
 
 ##################################################
 
-# This tutorial uses the WHI dataset as an example for generating phenotype files. Users are advised to make a copy of this script rather than edit directly. 
-# Users should replace the file path and file name variables to reflect that of their own system.
+# WHI walkthrough for the phenotype and covariate files read by the import scripts.
+# Copy this file and edit the copy. Replace the paths and dbGaP filenames with your own.
+#
+# For a convert prefix and directory named GARNET, this writes:
+#   GARNET_pheno.tsv, GARNET_covar.tsv, and GARNET_allchr.pfam
+# The same pattern is used for WHIMS. PLINK codes are 1 = control, 2 = case, -9 = missing.
 
 
 # Load in the necessary files which will be used for building the phenotype dataset #
@@ -22,9 +26,13 @@ c1_pheno_data_dir = "/usr/path/to/files/consentgroup1"
 c2_pheno_data_dir = "/usr/path/to/files/consentgroup2"
 
 
-# In the step above, we defined the directories which contain the phenotype files as c1_pheno_data_dir etc.
-# In the code below, you can rename the dataframe name (currently c1_form2) with any name you wish to use.
-# Then, you can simple replace the file name within the quotation marks ("") with the name of the file you wish to use.
+# Each pair of files is one consent group. The columns used below are:
+# form 2: age, race, diabetes
+# form 30: pancreatitis
+# form 41: Spanish and Black ancestry indicators
+# form 80: BMI and waist-hip ratio
+# outc_ct_os: days to pancreatic-cancer diagnosis, death, and end of follow-up
+# outc_cancer: pancreatic-cancer cases and tumour fields
 
 
 c1_form2 = pd.read_csv(os.path.join(c1_pheno_data_dir, "phs000200.v11.pht000998.v6.p3.c1.f2_rel1.HMB-IRB.txt"), sep="\t", comment="#")
@@ -75,8 +83,8 @@ WHI_Subject = pd.read_csv(os.path.join(c1_pheno_data_dir, "phs000200.v11.pht0009
 # The next set of files we will use contain information about the biological sample that was taken for conducting the genotyping and are stored within the phenotype subdirectory of the genotype directory.
 # We will use this files to extract the biological samples which are from the study we are interested in (i.e. SHARE or WHIMS)
 
-c1_genopheno_data_dir = "/home/anbennett2/scratch/datasets/raw_data/dbgap_data/WHI/746/c1/PhenotypeFiles"
-c2_genopheno_data_dir = "/home/anbennett2/scratch/datasets/raw_data/dbgap_data/WHI/746/c2/PhenotypeFiles"
+c1_genopheno_data_dir = "/usr/path/to/files/WHI/746/c1/PhenotypeFiles"
+c2_genopheno_data_dir = "/usr/path/to/files/WHI/746/c2/PhenotypeFiles"
 
 c1_746_pheno = pd.read_csv(os.path.join(c1_genopheno_data_dir, "phs000746.v2.pht004719.v1.p3.c1.WHI_Imputation_Sample_Attributes.HMB-IRB.txt"), sep="\t", comment="#")
 c2_746_pheno = pd.read_csv(os.path.join(c2_genopheno_data_dir, "phs000746.v2.pht004719.v1.p3.c2.WHI_Imputation_Sample_Attributes.HMB-IRB-NPU.txt"), sep="\t", comment="#")
@@ -89,10 +97,10 @@ phenogeno = pd.concat([c1_746_pheno, c2_746_pheno], axis=0,  ignore_index=True)
 
 # Loading the samples in the genotype dataset #
 
-# Here we will define the directory that contains the genotype files. This is because we will use the _allchr.tsv file produced in the convert-mac-module.sh script.
+# Directory written by convert-mac-module.sh. The folder name is the prefix, so GARNET contains GARNET_allchr.tsv.
 
-GARNET_genodir= "/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/GARNET_dataset"
-WHIMS_genodir= "/home/anbennett2/scratch/datasets/processed_data/dbgap/WHI/WHIMS_dataset"
+GARNET_genodir= "/usr/path/to/files/GARNET"
+WHIMS_genodir= "/usr/path/to/files/WHIMS"
 
 
 
@@ -100,6 +108,7 @@ GARNET_geno_samples = pd.read_csv(os.path.join(GARNET_genodir, "GARNET_allchr.ts
 WHIMS_geno_samples = pd.read_csv(os.path.join(WHIMS_genodir, "WHIMS_allchr.tsv"), sep="\t", comment="#", names=["FID", "IID", "In-Fam-ID-Dad", "In-Fam-ID-Mum", "SEX", "Pheno"])
 
 
+# Keep the imputation study (phs000746) and attach its subject id to each genotype sample.
 WHI_Sample_filt_746 = WHI_Sample[WHI_Sample.STUDY.str.match('phs000746')]
 
 GARNET_dataset_temp1= pd.merge(left=GARNET_geno_samples, right=WHI_Sample_filt_746[['SAMPLE_ID', 'dbGaP_Subject_ID']], how='left', left_on='FID', right_on='SAMPLE_ID')
@@ -132,6 +141,8 @@ WHI_Sample_filt_746 = drop_duplicate_samples(WHI_Sample_filt_746)
 # without which we cannot control for key confounders - hence this information is essential:
 
 
+# PANCREAS == 1 is a pancreatic-cancer case. PLINK stores a case as 2.
+# Assigning drop_duplicates is required. Calling it without assignment leaves the duplicate rows in place.
 pancan_occ = outc_cancer_rel4[outc_cancer_rel4['PANCREAS'] == 1.0].copy()
 pancan_occ.reset_index(inplace=True,drop=True)
 pancan_occ['case'] = 2
@@ -149,7 +160,7 @@ form80_WHRX=pd.DataFrame(form80_WHRX)
 form80_WHRX.reset_index(inplace=True)
 
 
-# Create empty DF with subject ID column based on form 2
+# The phenotype table starts from form 2, so a subject who is absent from form 2 is not added by the later merges.
 
 subject_ID = pd.DataFrame()
 subject_ID['dbGaP_Subject_ID'] = form2['dbGaP_Subject_ID'].copy()
@@ -179,8 +190,8 @@ my_pheno_file = pd.merge(left=my_pheno_file, right=form80_BMI, how='left', left_
 my_pheno_file = pd.merge(left=my_pheno_file, right=form80_WHRX[['dbGaP_Subject_ID', 'WHRX']], how='left', left_on='dbGaP_Subject_ID', right_on='dbGaP_Subject_ID')
 
 
-#can check with :
-my_pheno_file[my_pheno_file['case'] == 2]
+# In an interactive session, my_pheno_file[my_pheno_file['case'] == 2] shows the cases.
+# Running this file does not print that selection.
 
 my_pheno_file = my_pheno_file.drop_duplicates(subset=['dbGaP_Subject_ID'])
 
@@ -189,16 +200,12 @@ my_pheno_file = my_pheno_file.drop_duplicates(subset=['dbGaP_Subject_ID'])
 
 ###############################################################################################################################################################################
 
-## Add column denoting sex:
+# WHI participants are women, so sex is 2 for every subject.
+# PLINK codes sex as 1 = male, 2 = female, and 0 or missing when unknown.
+# For a study that records sex, assign the column. Do not uncomment the old
+# row-wide assignments: my_pheno_file[my_pheno_file['sex'] == 'F'] = 2 replaces the whole row.
 
 my_pheno_file['sex'] = 2
-
-# In plink, the sex is denoted as: 1=male/2=female/{0,NA}. Therefore, replace the values accordingly:
-
-#my_pheno_file[my_pheno_file['sex'] == 'M'] = 1
-#my_pheno_file[my_pheno_file['sex'] == 'F'] = 2
-
-#my_pheno_file['sex'].loc[my_pheno_file['sex-temp'] == 'F'] = 2
 
 
 
@@ -213,9 +220,9 @@ my_pheno_file = my_pheno_file.rename(columns={"RACE": "race", "DIAB": "HISTORY_D
 
 
 
-# Transform the columns as required for the analysis. Further information can be found within the WHI_SHARE_phenovariables_plan.xml file in the project directory.
+# The outcome files store days since enrollment. Add those days, converted to years, to age at enrollment.
 
-##  Convert age days enrolled from diagnosis to age diagnosed
+##  Convert days from enrollment to diagnosis into age at diagnosis
 
 
 my_pheno_file.AGE_DIAGNOSED = my_pheno_file.AGE + (my_pheno_file.AGE_DIAGNOSED / 365)
@@ -244,11 +251,8 @@ WHIMS_dataset_temp2 = pd.merge(left=WHIMS_dataset_temp1, right=my_pheno_file, ho
 
 
 
-GARNET_dataset_temp2['case']
-GARNET_dataset_temp2[GARNET_dataset_temp2['case'] == 2]
-
-WHIMS_dataset_temp2['case']
-WHIMS_dataset_temp2[WHIMS_dataset_temp2['case'] == 2]
+# In an interactive session, dataset[dataset['case'] == 2] shows the matched cases.
+# Running this file does not print that selection.
 
 
 
@@ -306,28 +310,25 @@ WHIMS_dataset_covar = WHIMS_dataset_covar.fillna(-9)
 
 
 
-# Set output directory
+# Write into the convert-mac-module.sh directory. This replaces GARNET_allchr.pfam
+# with the copy that carries sex and case. The import scripts read these three names.
 
-# replace accordingly
-
-GARNET_out_dir = "/usr/path/to/files/GARNET_dataset"
-
-# Output the files
-
-GARNET_dataset_pheno.to_csv(os.path.join(GARNET_out_dir, "GARNET_dataset_pheno.tsv"), sep='\t', index=False)
-GARNET_dataset_covar.to_csv(os.path.join(GARNET_out_dir, "GARNET_dataset_covar.tsv"), sep='\t', index=False)
-GARNET_dataset_pfam.to_csv(os.path.join(GARNET_out_dir, "GARNET_dataset_allchr.pfam"), sep='\t', index=False, header=False)
-
-
-
-# Set output directory
-
-# replace accordingly
-
-WHIMS_out_dir = "/usr/path/to/files/WHIMS_dataset"
+GARNET_out_dir = "/usr/path/to/files/GARNET"
 
 # Output the files
 
-WHIMS_dataset_pheno.to_csv(os.path.join(WHIMS_out_dir, "WHIMS_dataset_pheno.tsv"), sep='\t', index=False)
-WHIMS_dataset_covar.to_csv(os.path.join(WHIMS_out_dir, "WHIMS_dataset_covar.tsv"), sep='\t', index=False)
-WHIMS_dataset_pfam.to_csv(os.path.join(WHIMS_out_dir, "WHIMS_dataset_allchr.pfam"), sep='\t', index=False, header=False)
+GARNET_dataset_pheno.to_csv(os.path.join(GARNET_out_dir, "GARNET_pheno.tsv"), sep='\t', index=False)
+GARNET_dataset_covar.to_csv(os.path.join(GARNET_out_dir, "GARNET_covar.tsv"), sep='\t', index=False)
+GARNET_dataset_pfam.to_csv(os.path.join(GARNET_out_dir, "GARNET_allchr.pfam"), sep='\t', index=False, header=False)
+
+
+
+# Same three names for WHIMS. The directory name is the file prefix.
+
+WHIMS_out_dir = "/usr/path/to/files/WHIMS"
+
+# Output the files
+
+WHIMS_dataset_pheno.to_csv(os.path.join(WHIMS_out_dir, "WHIMS_pheno.tsv"), sep='\t', index=False)
+WHIMS_dataset_covar.to_csv(os.path.join(WHIMS_out_dir, "WHIMS_covar.tsv"), sep='\t', index=False)
+WHIMS_dataset_pfam.to_csv(os.path.join(WHIMS_out_dir, "WHIMS_allchr.pfam"), sep='\t', index=False, header=False)

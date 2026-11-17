@@ -46,7 +46,7 @@ Total time from installation of singularity, building the container and moving i
 
 Automated preparation of the phenotype file is not part of Canary. `Tutorial-for-Phenotype-File.py` is a WHI walkthrough. Copy it and edit the copy.
 
-The import scripts look for a phenotype file and a covariate file beside the genotype files. For a prefix or folder named `SHARE`, those names are `SHARE_pheno.tsv` and `SHARE_covar.tsv`. The tutorial writes names such as `GARNET_dataset_pheno.tsv`. Rename or place the files so they match the script you are about to run.
+The import scripts look for a phenotype file and a covariate file beside the genotype files. For a prefix or folder named `GARNET`, those names are `GARNET_pheno.tsv` and `GARNET_covar.tsv`. The tutorial writes those names.
 
 ## Genotype File Preparation
 

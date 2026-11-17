@@ -68,6 +68,13 @@ then
     exit 1
 fi
 
+if [ ${#datasets[@]} -lt 2 ]
+then
+    printf "Error: this script needs at least two -d directories. One was provided.\n"
+    printf "Add the missing dataset. Use correct-plinkfiles.sh only when there is truly one dataset.\n"
+    exit 1
+fi
+
 # sense check given consent directories exist, can also check for correct data etc.
 for dir in "${datasets[@]}"
 do
@@ -78,6 +85,8 @@ do
         exit 1
     fi
 done
+
+mkdir -p "${out_dir}"
 
 # display a helpful message of inputs
 printf "\nCombining directories (-d):\n"
