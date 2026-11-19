@@ -212,8 +212,9 @@ Update sex in the genotype files with PLINK `--update-sex` and the phenotype fil
 ### Smoke test (dummy MaCH files)
 
 `testdata/` has a generator and runner that build a tiny synthetic MaCH/minimac
-dataset (all 22 chromosomes, two SHARE consent groups, plus GARNET/WHIMS for
-the merge path) and run `convert-mac-module.sh`, `correct-plinkfiles.sh`, and
+dataset under coined prefixes (ZYQLOT, NULDRA, JIVCAL; all 22 chromosomes, two
+ZYQLOT input groups, plus a NULDRA/JIVCAL merge). It runs
+`convert-mac-module.sh`, `correct-plinkfiles.sh`, and
 `combine-datasets-module.sh` on the host. It does not build the Singularity
 image. See `testdata/README.md`.
 
