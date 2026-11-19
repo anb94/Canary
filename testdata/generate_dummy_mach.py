@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Write a tiny synthetic MaCH/minimac dosage dataset for Canary smoke tests.
 
-Cohort prefixes are coined toy names, not real studies. File names follow
-convert-mac-module.sh: PREFIX + chrN + a letter + .dose.* / .info.
+Dataset prefixes are bland toy labels (TOYSET, DEMDAT, SIMSET), not real
+studies. File names follow convert-mac-module.sh: PREFIX + chrN + a letter
++ .dose.* / .info.
 Each .dose line is FID->IID MLDOSE <one dosage per SNP>.
 Each .info file is a MaCH mlinfo header (SNP Al1 Al2 Freq1 MAF Quality Rsq)
 plus one row per SNP. Rsq is column 7.
@@ -11,7 +12,7 @@ Every SNP ID is colon-delimited chr:pos or chr:pos:ref:alt so
 correct-plinkfiles.sh can fill numeric chromosome and position. There are
 no rs IDs.
 
-ZYQLOT has two input groups so concatenation is exercised. NULDRA and JIVCAL
+TOYSET has two input groups so concatenation is exercised. DEMDAT and SIMSET
 are smaller second datasets that share some SNPs and differ on others, for
 combine-datasets-module.sh.
 """
@@ -29,13 +30,13 @@ CHROMS = range(1, 23)
 # Dummy letter immediately after the chromosome number (convert-mac-module.sh
 # requires [a-z] there so chr1 does not also match chr10–chr19). This is not
 # an ancestry or study code.
-PANEL_TAG = "q"
+PANEL_TAG = "x"
 
-# Coined toy prefixes. These are invented strings, not the name or acronym of
-# a real cohort, biobank, or dbGaP study.
-PRIMARY = "ZYQLOT"
-SECOND = "NULDRA"
-THIRD = "JIVCAL"
+# Bland toy prefixes for a small demo panel. Not the name or acronym of a
+# real cohort, biobank, or dbGaP study.
+PRIMARY = "TOYSET"
+SECOND = "DEMDAT"
+THIRD = "SIMSET"
 
 # (snp_id_template, al1, al2, rsq, role)
 # Templates may contain {chrom}, {pos_*}, {al1}, {al2}.
@@ -60,10 +61,10 @@ THIRD_SNPS = (
     ("{chrom}:710000", "A", "G", 0.99, "third_only_keep"),
 )
 
-PRIMARY_G1 = ("ZYQLOT01", "ZYQLOT02", "ZYQLOT03")
-PRIMARY_G2 = ("ZYQLOT04", "ZYQLOT05")
-SECOND_SAMPLES = ("NULDRA01", "NULDRA02", "NULDRA03")
-THIRD_SAMPLES = ("JIVCAL01", "JIVCAL02")
+PRIMARY_G1 = ("TOYSET01", "TOYSET02", "TOYSET03")
+PRIMARY_G2 = ("TOYSET04", "TOYSET05")
+SECOND_SAMPLES = ("DEMDAT01", "DEMDAT02", "DEMDAT03")
+THIRD_SAMPLES = ("SIMSET01", "SIMSET02")
 
 SNP_ID_RE = re.compile(r"^[0-9]+:[0-9]+(?::[ACGT]:[ACGT])?$")
 FORBIDDEN_NAME_RE = re.compile(
@@ -176,14 +177,14 @@ def main() -> None:
         "--out",
         type=Path,
         default=Path(__file__).resolve().parent / "dummy-mach",
-        help="Directory that will contain ZYQLOT, NULDRA, and JIVCAL input folders.",
+        help="Directory that will contain TOYSET, DEMDAT, and SIMSET input folders.",
     )
     args = parser.parse_args()
     out = args.out
     os.makedirs(out, exist_ok=True)
 
-    # Replace the current toy trees. Also delete leftover folders from an
-    # earlier dummy that used real study names as prefixes.
+    # Replace the current toy trees. Also delete leftover folders from
+    # earlier dummy drafts.
     for name in (
         PRIMARY,
         SECOND,
@@ -192,6 +193,10 @@ def main() -> None:
         "GARNET",
         "WHIMS",
         "WHI",
+        "ZYQLOT",
+        "NULDRA",
+        "JIVCAL",
+        "ZYQMRG",
     ):
         shutil.rmtree(out / name, ignore_errors=True)
     (out / "MANIFEST.txt").unlink(missing_ok=True)
@@ -219,13 +224,13 @@ def main() -> None:
     manifest.write_text(
         "\n".join(
             [
-                "Canary toy MaCH/minimac dosage data (coined prefixes, not real studies).",
+                "Canary toy MaCH/minimac dosage data (TOYSET/DEMDAT/SIMSET, not real studies).",
                 "",
-                "ZYQLOT: 2 groups, 5 samples (ZYQLOT01–03 in group_a, ZYQLOT04–05 in group_b),",
+                "TOYSET: 2 groups, 5 samples (TOYSET01–03 in group_a, TOYSET04–05 in group_b),",
                 "        22 chromosomes, 4 SNPs/chr (2 keep chr:pos, 1 Rsq 0.55, 1 Rsq 0.10).",
                 "        One keep SNP is chr:pos:ref:alt; none are rs IDs.",
-                "NULDRA: 1 group, 3 samples, 22 chr, 4 SNPs/chr (2 shared with JIVCAL, 2 unique).",
-                "JIVCAL: 1 group, 2 samples, 22 chr, 4 SNPs/chr (2 shared with NULDRA, 2 unique).",
+                "DEMDAT: 1 group, 3 samples, 22 chr, 4 SNPs/chr (2 shared with SIMSET, 2 unique).",
+                "SIMSET: 1 group, 2 samples, 22 chr, 4 SNPs/chr (2 shared with DEMDAT, 2 unique).",
                 "",
                 "Names match convert-mac-module.sh (letter immediately after the chromosome number).",
                 f"Written under: {out}",

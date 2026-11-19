@@ -4,19 +4,19 @@ This directory is a small, synthetic MaCH/minimac dosage dataset plus a runner
 that exercises the conversion scripts on current `main`. It is not a substitute
 for large real filesets.
 
-The toy cohort prefixes are coined: **ZYQLOT**, **NULDRA**, **JIVCAL**, and
-**ZYQMRG**. They are not the name, acronym, or nickname of a real cohort,
+The toy prefixes are bland demo labels: **TOYSET**, **DEMDAT**, **SIMSET**, and
+**COMBSET**. They are not the name, acronym, or nickname of a real cohort,
 biobank, or dbGaP study.
 
 ## What it covers
 
-1. `convert-mac-module.sh` on **ZYQLOT**: two input groups, chromosomes 1–22,
+1. `convert-mac-module.sh` on **TOYSET**: two input groups, chromosomes 1–22,
    concatenation, `.info` copy, Rsq 0.3 / 0.8 low-quality lists, the row/column
-   QC log, `dose2plink`, and `ZYQLOT_allchr.pdat` / `.pfam`.
-2. `correct-plinkfiles.sh` on that ZYQLOT output, with matching
-   `ZYQLOT_pheno.tsv` and `ZYQLOT_covar.tsv`.
-3. `combine-datasets-module.sh` on **NULDRA** and **JIVCAL**, which share some
-   SNPs and differ on others. Merged files use the prefix **ZYQMRG**.
+   QC log, `dose2plink`, and `TOYSET_allchr.pdat` / `.pfam`.
+2. `correct-plinkfiles.sh` on that TOYSET output, with matching
+   `TOYSET_pheno.tsv` and `TOYSET_covar.tsv`.
+3. `combine-datasets-module.sh` on **DEMDAT** and **SIMSET**, which share some
+   SNPs and differ on others. Merged files use the prefix **COMBSET**.
 
 It does **not** build the Singularity/Apptainer image. Compile or install
 `dose2plink`, PLINK 2, and PLINK 1.9 on the host (the same sources as
@@ -26,12 +26,12 @@ It does **not** build the Singularity/Apptainer image. Compile or install
 
 | Dataset | Input groups | Samples | SNPs / chromosome |
 | --- | --- | --- | --- |
-| ZYQLOT | `group_a`, `group_b` | 5 (3+2) | 4 |
-| NULDRA | `group_a` | 3 | 4 |
-| JIVCAL | `group_a` | 2 | 4 |
+| TOYSET | `group_a`, `group_b` | 5 (3+2) | 4 |
+| DEMDAT | `group_a` | 3 | 4 |
+| SIMSET | `group_a` | 2 | 4 |
 
-Names look like `ZYQLOTchr1q.dose.a` and `ZYQLOTchr1q.info` so a search for
-chromosome 1 cannot also match `chr10`–`chr19`. The letter `q` after the
+Names look like `TOYSETchr1x.dose.a` and `TOYSETchr1x.info` so a search for
+chromosome 1 cannot also match `chr10`–`chr19`. The letter `x` after the
 chromosome number is a dummy tag required by that glob; it is not an ancestry
 or study code.
 
@@ -39,7 +39,7 @@ Every SNP ID is `chr:pos` or `chr:pos:ref:alt`. There are no rs IDs.
 `correct-plinkfiles.sh` fills chromosome and position by splitting the SNP ID
 on `:`, so these IDs are what that step expects.
 
-ZYQLOT SNPs on chromosome *N*:
+TOYSET SNPs on chromosome *N*:
 
 - `N:(100000+N)` — Rsq 0.95, chr:pos (kept; chr/pos correction fills numeric chr and POS)
 - `N:(200000+N)` — Rsq 0.55 (low-quality at 0.8)

@@ -3,8 +3,8 @@
 # combine-datasets-module.sh on the synthetic MaCH files from
 # generate_dummy_mach.py.
 #
-# Toy prefixes (ZYQLOT, NULDRA, JIVCAL, ZYQMRG) are coined and are not
-# real study names.
+# Toy prefixes (TOYSET, DEMDAT, SIMSET, COMBSET) are bland demo labels,
+# not real study names.
 #
 # Prerequisites on PATH: gawk, dose2plink, plink2, plink (1.9).
 # Does not build the Singularity image.
@@ -19,10 +19,10 @@ CONVERT="${ROOT}/convert-mac-module.sh"
 CORRECT="${ROOT}/correct-plinkfiles.sh"
 COMBINE="${ROOT}/combine-datasets-module.sh"
 
-PRIMARY=ZYQLOT
-SECOND=NULDRA
-THIRD=JIVCAL
-MERGED=ZYQMRG
+PRIMARY=TOYSET
+SECOND=DEMDAT
+THIRD=SIMSET
+MERGED=COMBSET
 
 PASS=0
 FAIL=0
@@ -97,7 +97,7 @@ no_rs_ids_in_info() {
 }
 check "generated .info files contain no rs SNP IDs" no_rs_ids_in_info
 
-# --- convert-mac-module.sh (ZYQLOT, two groups, chr 1–22) ---
+# --- convert-mac-module.sh (TOYSET, two groups, chr 1–22) ---
 log ""
 log "=== convert-mac-module.sh ${PRIMARY} ==="
 set +e
@@ -139,14 +139,14 @@ c1_n=$(wc -l < "${WORK}/${PRIMARY}/${PRIMARY}_chr1.dose")
 c10_n=$(wc -l < "${WORK}/${PRIMARY}/${PRIMARY}_chr10.dose")
 check "chr1 dose has 5 sample rows (not chr10 mixed in)" test "${c1_n}" -eq 5
 check "chr10 dose has 5 sample rows" test "${c10_n}" -eq 5
-check "concatenated chr1 dose contains ZYQLOT01 from group_a" \
-  grep -q "ZYQLOT01->ZYQLOT01" "${WORK}/${PRIMARY}/${PRIMARY}_chr1.dose"
-check "concatenated chr1 dose contains ZYQLOT04 from group_b" \
-  grep -q "ZYQLOT04->ZYQLOT04" "${WORK}/${PRIMARY}/${PRIMARY}_chr1.dose"
+check "concatenated chr1 dose contains TOYSET01 from group_a" \
+  grep -q "TOYSET01->TOYSET01" "${WORK}/${PRIMARY}/${PRIMARY}_chr1.dose"
+check "concatenated chr1 dose contains TOYSET04 from group_b" \
+  grep -q "TOYSET04->TOYSET04" "${WORK}/${PRIMARY}/${PRIMARY}_chr1.dose"
 
 # Info is copied from the first input group only.
 check "chr1 info matches group_a (copied, not rebuilt)" \
-  cmp -s "${GEN}/${PRIMARY}/group_a/${PRIMARY}chr1q.info" "${WORK}/${PRIMARY}/${PRIMARY}_chr1.info"
+  cmp -s "${GEN}/${PRIMARY}/group_a/${PRIMARY}chr1x.info" "${WORK}/${PRIMARY}/${PRIMARY}_chr1.info"
 
 # QC log: info rows = 5 (header+4 SNPs), dose columns = 6 (FID->IID, MLDOSE, 4 dosages).
 check "QC log has 22 chromosome lines" \
@@ -224,11 +224,11 @@ fi
 if [[ -f "${WORK}/${PRIMARY}/${PRIMARY}_plink1_temp1_updated.fam" ]]; then
   fam_n=$(wc -l < "${WORK}/${PRIMARY}/${PRIMARY}_plink1_temp1_updated.fam")
   check "updated fam has 5 samples" test "${fam_n}" -eq 5
-  check "phenotype case status reached the fam (ZYQLOT01 is case 2)" \
-    grep -q $'^ZYQLOT01\tZYQLOT01\t0\t0\t1\t2$' "${WORK}/${PRIMARY}/${PRIMARY}_plink1_temp1_updated.fam"
+  check "phenotype case status reached the fam (TOYSET01 is case 2)" \
+    grep -q $'^TOYSET01\tTOYSET01\t0\t0\t1\t2$' "${WORK}/${PRIMARY}/${PRIMARY}_plink1_temp1_updated.fam"
 fi
 
-# --- combine-datasets-module.sh (NULDRA + JIVCAL) ---
+# --- combine-datasets-module.sh (DEMDAT + SIMSET) ---
 log ""
 log "=== convert-mac + combine-datasets-module.sh ${SECOND}/${THIRD} ==="
 mkdir -p "${WORK}/${SECOND}" "${WORK}/${THIRD}" "${WORK}/${MERGED}"
@@ -285,9 +285,9 @@ if [[ -f "${WORK}/${MERGED}/${MERGED}_temp2_updated.bim" ]]; then
   log "NOTE  merged bim variant count: ${merge_n}"
   check "merged bim contains shared SNP 1:100000 with chr/pos filled" \
     grep -q $'^1\t1:100000\t0\t100000\t' "${merge_bim}"
-  check "merged bim does not contain NULDRA-only SNP 1:410000" \
+  check "merged bim does not contain DEMDAT-only SNP 1:410000" \
     test "$(grep -c $'\t1:410000\t' "${merge_bim}" || true)" -eq 0
-  check "merged bim does not contain JIVCAL-only SNP 1:510000" \
+  check "merged bim does not contain SIMSET-only SNP 1:510000" \
     test "$(grep -c $'\t1:510000\t' "${merge_bim}" || true)" -eq 0
   check "merged bim has numeric chr, colon ID, and numeric POS on every row" \
     bim_chr_pos_clean "${merge_bim}"
@@ -295,7 +295,7 @@ fi
 
 if [[ -f "${WORK}/${MERGED}/${MERGED}_temp2_updated.fam" ]]; then
   merge_fam=$(wc -l < "${WORK}/${MERGED}/${MERGED}_temp2_updated.fam")
-  check "merged fam has 5 samples (3 NULDRA + 2 JIVCAL)" test "${merge_fam}" -eq 5
+  check "merged fam has 5 samples (3 DEMDAT + 2 SIMSET)" test "${merge_fam}" -eq 5
 fi
 
 if [[ -f "${WORK}/${MERGED}/${MERGED}_temp2_updated.bed" ]]; then
