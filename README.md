@@ -209,6 +209,15 @@ The corrected PLINK 1 files are `SHARE_plink1_temp1_updated.bed`, `.bim`, and `.
 
 Update sex in the genotype files with PLINK `--update-sex` and the phenotype file from the tutorial. See the PLINK documentation for that command.
 
+### Smoke test (dummy MaCH files)
+
+`testdata/` has a generator and runner that build a tiny synthetic MaCH/minimac
+dataset under bland demo prefixes (TOYSET, DEMDAT, SIMSET; all 22 chromosomes,
+two TOYSET input groups, plus a DEMDAT/SIMSET merge as COMBSET). It runs
+`convert-mac-module.sh`, `correct-plinkfiles.sh`, and
+`combine-datasets-module.sh` on the host. It does not build the Singularity
+image. See `testdata/README.md`.
+
 ### Canary Logo Credit
 
 Canary logo was created using an original image from <a href="https://www.vecteezy.com/free-vector/nature">Nature Vectors by Vecteezy</a>.
